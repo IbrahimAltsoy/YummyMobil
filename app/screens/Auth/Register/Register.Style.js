@@ -1,5 +1,4 @@
 import { StyleSheet } from "react-native";
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -42,33 +41,35 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingVertical: 15,
   },
+  text: {
+    fontSize: 16,
+    color: "#333",
+    marginRight: 10, // Buton ile aralarına mesafe ekliyoruz
+    fontWeight: "500",
+  },
   linkContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "80%",
-    marginBottom: 0,
+    flexDirection: "row", // Yatay hizalama
+    justifyContent: "flex-start", // Sola yaslama
+    alignItems: "center", // Dikeyde ortalama
+    width: "80%", // Genişlik
+    marginTop: 20,
   },
   linkButton: {
     backgroundColor: "transparent",
-    borderColor: "transparent", // Link butonları için sınır yok
-    paddingVertical: 0,
-    paddingHorizontal: 0,
-    marginBottom: 10,
+    borderColor: "transparent",
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    marginLeft: 10, // Butonlar arasına mesafe eklemek için
+    borderRadius: 20, // Köşeleri yuvarlatıyoruz
+    fontSize: 16,
+    color: "#FFD700", // Buton rengi sarı
+    fontWeight: "bold",
   },
-  socialButtonContainer: {
-    width: "80%",
-  },
-  socialButton: {
-    backgroundColor: "transparent",
-    borderColor: "#FFD700",
-    borderWidth: 1,
-    paddingVertical: 10,
-    marginBottom: 10,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 25,
+  buttonContainer: {
+    flexDirection: "row", // Butonları yatay hizalar
+    justifyContent: "space-between", // Birini sola, diğerini sağa yaslar
+    alignItems: "center", // Dikeyde ortalar
+    marginTop: 20,
   },
 });
-
 export default styles;

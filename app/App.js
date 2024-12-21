@@ -1,13 +1,14 @@
 import React from "react";
 import Router from "./navigations/Router";
-import { NavigationContainer } from "@react-navigation/native";
- 
-// değişikliklr 
+import AuthContext, { AuthProvider } from "./context/AuthContext";
+
 const App = () => {
   return (
-    <NavigationContainer>
-      <Router />
-    </NavigationContainer>
+    <AuthProvider>
+      <NavigationContainer>
+        <Router />
+      </NavigationContainer>
+    </AuthProvider>
   );
 };
 

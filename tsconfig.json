@@ -13,5 +13,8 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-  ]
+, "app/components/YButton/YButton.Style.js", "app/context/AuthContext.tsx"  ],
+"exclude": [
+  "app/models/**/*"  // burası model klasörünü okumasın diye eklendi
+],
 }
