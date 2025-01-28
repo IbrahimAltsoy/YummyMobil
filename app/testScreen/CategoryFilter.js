@@ -16,7 +16,7 @@ const categories = [
   { id: 4, name: "Barlar", icon: "beer" },
   { id: 5, name: "Spor Salonları", icon: "fitness" },
   { id: 6, name: "Telefon Dükkanları", icon: "phone-portrait" },
-  { id: 7, name: "Güzellik Merkezleri", icon: "scissors" },
+  { id: 7, name: "Güzellik Merkezleri", icon: "heart" },
 ];
 
 const CategoryDropdown = ({ onCategorySelect }) => {

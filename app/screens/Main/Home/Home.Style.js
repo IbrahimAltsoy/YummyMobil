@@ -36,19 +36,20 @@ export default StyleSheet.create({
     marginBottom: 10,
   },
   filterAndButtonContainer: {
+    display: "flex",
+
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
+  },
+  categoryFilter: {
+    flex: 1, // Kalan alanı eşit olarak kaplamasını sağlar
   },
   commentButton: {
+    flex: 1, // Kalan alanı eşit olarak kaplamasını sağlar
     backgroundColor: "#FFB800",
-    borderRadius: 5,
-    padding: 10,
   },
   buttonText: {
     color: "white",
-    fontWeight: "bold",
   },
   modalView: {
     flex: 1,
@@ -57,7 +58,7 @@ export default StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: "white",
+    backgroundColor: "red",
     padding: 20,
     borderRadius: 10,
   },
@@ -77,5 +78,9 @@ export default StyleSheet.create({
   submitButtonText: {
     color: "white",
     fontWeight: "bold",
+  },
+  errorText: {
+    color: "red",
+    marginTop: 10,
   },
 });
