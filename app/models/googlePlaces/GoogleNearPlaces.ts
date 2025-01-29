@@ -5,4 +5,5 @@ export interface GoogleNearPlaces {
   place_id: string;
   photoUrl: string;
   user_Ratings_Total: number;
+  distance: number;
 }

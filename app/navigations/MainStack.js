@@ -5,19 +5,29 @@ import AuthContext, { AuthProvider } from "../context/AuthContext";
 import ProfileScreen from "../screens/Main/Profile/ProfileScreen";
 import ServiceScreen from "../screens/Main/Service/ServiceScreen";
 import TabStack from "./TabStack";
-const Drawer = createDrawerNavigator();
+import BusinessDetailScreen from "../screens/Main/BusinessDetail/BusinessDetailScreen";
+import { createStackNavigator } from "@react-navigation/stack";
+
+// const Drawer = createDrawerNavigator();
+const Stack = createStackNavigator();
 
 const MainStack = () => (
   // <AuthProvider>
-  <Drawer.Navigator initialRouteName="Tabs">
-    <Drawer.Screen
-      name="Tabs"
-      component={TabStack}
+  <Stack.Navigator initialRouteName="Home">
+    <Stack.Screen
+      name="Home"
+      component={HomeScreen}
       options={{ headerShown: false }}
     />
-    <Drawer.Screen name="profile" component={ProfileScreen} />
-    <Drawer.Screen name="service" component={ServiceScreen} />
-  </Drawer.Navigator>
+
+    <Stack.Screen name="profile" component={ProfileScreen} />
+    <Stack.Screen name="service" component={ServiceScreen} />
+    <Stack.Screen
+      name="businessdetails"
+      component={BusinessDetailScreen}
+      options={{ title: "İşletme Detayı" }}
+    />
+  </Stack.Navigator>
   // </AuthProvider>
 );
 

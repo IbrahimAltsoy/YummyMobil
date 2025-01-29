@@ -1,14 +1,16 @@
 import React from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 
 interface YCardProps {
-  name: string; // İşletme adı
-  vicinity: string; // İşletme adresi
-  rating: number; // İşletme puanı
-  photoUrl?: string; // İşletme fotoğrafı (opsiyonel)
-  user_Ratings_Total: number; // Toplam kullanıcı oyu
+  name: string;
+  vicinity: string;
+  rating: number;
+  photoUrl?: string;
+  user_Ratings_Total: number;
   place_id: string;
+  distance: number;
+  onPlacePress: (place_id: string) => void;
 }
 
 const YCard: React.FC<YCardProps> = ({
@@ -17,29 +19,44 @@ const YCard: React.FC<YCardProps> = ({
   rating,
   photoUrl,
   user_Ratings_Total,
+  place_id,
+  distance,
+  onPlacePress,
 }) => {
   return (
     <View style={styles.card}>
-      {/* İşletme Fotoğrafı */}
-      {photoUrl ? (
-        <Image source={{ uri: photoUrl }} style={styles.image} />
-      ) : (
-        <Text>No Image Available</Text>
-      )}
+      {/* 📌 Görsel Sola Alındı */}
+      <Image source={{ uri: photoUrl }} style={styles.image} />
 
-      {/* İşletme Adı */}
-      <Text style={styles.name}>{name}</Text>
+      {/* 📌 Sağ Tarafta İşletme Bilgileri */}
+      <View style={styles.infoContainer}>
+        <Text style={styles.name}>{name}</Text>
+        <Text style={styles.vicinity}>{vicinity}</Text>
 
-      {/* İşletme Adresi */}
-      <Text style={styles.vicinity}>{vicinity}</Text>
+        {/* 📌 Puanlama ve Mesafe */}
+        <View style={styles.detailsRow}>
+          <View style={styles.ratingContainer}>
+            <Icon name="star" size={14} color="gold" />
+            <Text style={styles.rating}>
+              {rating > 0 ? `${rating.toFixed(1)} / 5` : "Not Rated"}
+            </Text>
+            <Text style={styles.ratingCount}>({user_Ratings_Total} oy)</Text>
+          </View>
 
-      {/* Derecelendirme ve Kullanıcı Oy Sayısı */}
-      <View style={styles.ratingContainer}>
-        <Icon name="star" size={16} color="gold" />
-        <Text style={styles.rating}>
-          {rating > 0 ? `${rating.toFixed(1)} / 5` : "Not Rated"}
-        </Text>
-        <Text style={styles.ratingCount}>({user_Ratings_Total} reviews)</Text>
+          {/* 📌 Mesafe */}
+          <View style={styles.distanceContainer}>
+            <Icon name="location" size={14} color="red" />
+            <Text style={styles.distance}>{distance.toFixed(2)} km</Text>
+          </View>
+        </View>
+
+        {/* 📌 Detayları Gör Butonu */}
+        <TouchableOpacity
+          style={styles.detailButton}
+          onPress={() => onPlacePress(place_id)}
+        >
+          <Text style={styles.detailButtonText}>Detayları Gör</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -47,45 +64,43 @@ const YCard: React.FC<YCardProps> = ({
 
 const styles = StyleSheet.create({
   card: {
+    flexDirection: "row", // Yatay hizalama
     backgroundColor: "#fff",
-    borderRadius: 10,
+    borderRadius: 12,
     shadowColor: "#000",
     shadowOpacity: 0.1,
-    shadowRadius: 5,
+    shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
     elevation: 3,
-    marginVertical: 10,
-    padding: 15,
+    marginVertical: 8,
+    padding: 10,
+    width: "95%",
+    alignSelf: "center",
+    alignItems: "center", // Dikey hizalama
   },
   image: {
-    width: "100%",
-    height: 150,
+    width: 100, // Küçük ve solda
+    height: 100,
     borderRadius: 10,
-    marginBottom: 10,
+    marginRight: 10, // Sağ tarafa boşluk bırak
   },
-  noImageContainer: {
-    width: "100%",
-    height: 150,
-    borderRadius: 10,
-    backgroundColor: "#e0e0e0",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  noImageText: {
-    color: "#666",
-    fontSize: 14,
+  infoContainer: {
+    flex: 1, // Sağ tarafın tüm alanı kaplamasını sağla
   },
   name: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     color: "#333",
-    marginBottom: 5,
   },
   vicinity: {
-    fontSize: 14,
+    fontSize: 13,
     color: "#666",
-    marginBottom: 10,
+    marginBottom: 5,
+  },
+  detailsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   ratingContainer: {
     flexDirection: "row",
@@ -93,13 +108,38 @@ const styles = StyleSheet.create({
   },
   rating: {
     marginLeft: 5,
-    fontSize: 14,
-    color: "#333",
+    fontSize: 13,
+    fontWeight: "bold",
+    color: "#444",
   },
   ratingCount: {
-    marginLeft: 10,
-    fontSize: 14,
+    marginLeft: 5,
+    fontSize: 12,
     color: "#666",
+  },
+  distanceContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  distance: {
+    marginLeft: 5,
+    fontSize: 13,
+    fontWeight: "bold",
+    color: "#444",
+  },
+  detailButton: {
+    marginTop: 6,
+    backgroundColor: "#FFA726", // Daha yumuşak turuncu tonu
+    paddingVertical: 6, // Yüksekliği küçülttük
+    borderRadius: 20, // Daha zarif ve yuvarlak
+    alignItems: "center",
+    width: "80%", // Butonu biraz daralttık
+    alignSelf: "center",
+  },
+  detailButtonText: {
+    color: "#fff",
+    fontSize: 13, // Yazıyı biraz küçülttük
+    fontWeight: "bold",
   },
 });
 

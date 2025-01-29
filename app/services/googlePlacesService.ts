@@ -23,6 +23,7 @@ const GooglePlacesService = {
         place_id: place.place_Id, // Backend'den gelen place_Id, modelde place_id olarak dönüştürülüyor
         photoUrl: place.photoUrl,
         user_Ratings_Total: place.user_Ratings_Total,
+        distance: place.distance,
       }));
 
       return places;
