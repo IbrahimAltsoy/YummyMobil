@@ -1,6 +1,7 @@
 import axios from "axios";
 import API_URL from "../utils/baseUrl";
 import { GoogleNearPlaces } from "../models/googlePlaces/googleNearPlaces";
+import { PlaceDetailResult } from "../models/googlePlaces/PlaceDetailResult";
 
 const GooglePlacesService = {
   async getNearbyPlaces(
@@ -30,6 +31,17 @@ const GooglePlacesService = {
     } catch (error: any) {
       console.error("Google Places API Error:", error);
       throw new Error("Yakındaki mekanları alırken bir hata oluştu.");
+    }
+  },
+  async getPlaceDetails(place_Id: string): Promise<PlaceDetailResult | null> {
+    try {
+      const response = await axios.get<PlaceDetailResult>(
+        `${API_URL.API_BASE_URL}/test/get-business-detail/${place_Id}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("İşletme detayları alınırken hata oluştu:", error);
+      return null;
     }
   },
 };

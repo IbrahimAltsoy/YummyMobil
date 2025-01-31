@@ -43,9 +43,7 @@ const HomeScreen: React.FC = () => {
     fetchPlaces();
   }, []);
   const handleBusinessDetails = (place_id: string) => {
-    console.log(`İşletme Detaylarına Git: ${place_id}`);
-    //Detaya git yönlendirmesi yapacaz
-    navigation.navigate("businessdetails");
+    navigation.navigate("businessdetails", { place_id });
   };
   const handleCategorySelect = (category: any) => {
     setSelectedCategory(category);

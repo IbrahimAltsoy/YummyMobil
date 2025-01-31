@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -7,123 +7,175 @@ import {
   TouchableOpacity,
   Linking,
   StyleSheet,
+  ActivityIndicator,
+  Dimensions,
+  ScrollView,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import MapView, { Marker } from "react-native-maps";
-
-const fakeBusiness = {
-  id: "123456",
-  name: "Örnek İşletme",
-  address: "123 Örnek Sokak, İstanbul",
-  image: "https://picsum.photos/400/300",
-  rating: 4.5,
-  reviewCount: 120,
-  isOpen: true,
-  phone: "+905551234567",
-  latitude: 41.0082,
-  longitude: 28.9784,
-  distance: "2.3 km",
-  description: "Kahvaltı, Öğle Yemeği, Akşam Yemeği servisi yapılmaktadır.",
-  workingHours: "08:00 - 22:00",
-};
-
-const fakeReviews = [
-  { author_name: "Ali", rating: 5, text: "Harika bir deneyimdi!" },
-  { author_name: "Ayşe", rating: 4, text: "Gayet iyiydi, tekrar gelirim." },
-  { author_name: "Mehmet", rating: 3, text: "Ortalama bir yer." },
-];
+import PlaceService from "../../../services/googlePlacesService";
+import { PlaceDetailResult } from "../../../models/googlePlaces/PlaceDetailResult";
+import Carousel from "react-native-snap-carousel";
+import { Pagination } from "react-native-snap-carousel";
 
 const BusinessDetailScreen = () => {
   const route = useRoute();
-  const { business }: any = route.params || { business: fakeBusiness };
-  const [reviews, setReviews] = useState(fakeReviews);
+  const activeSlideRef = useRef(0);
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  const { place_id } = route.params as { place_id: string };
+  const [placeDetail, setPlaceDetail] = useState<PlaceDetailResult | null>(
+    null
+  );
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    fetch(
-      `https://maps.googleapis.com/maps/api/place/details/json?place_id=${business?.id}&key=YOUR_API_KEY`
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.result?.reviews) {
-          setReviews(data.result.reviews.slice(0, 10));
-        }
-      })
-      .catch((error) => console.error(error));
-  }, [business?.id]);
+    const fetchData = async () => {
+      setLoading(true);
+      const data = await PlaceService.getPlaceDetails(place_id);
+      setPlaceDetail(data);
+      setLoading(false);
+    };
+    fetchData();
+  }, [place_id]);
+
+  if (loading) {
+    return (
+      <ActivityIndicator size="large" color="blue" style={styles.loader} />
+    );
+  }
+
+  const renderImageItem = ({ item }: { item: string }) => (
+    <Image source={{ uri: item }} style={styles.carouselImage} />
+  );
+
+  const handleClaimBusiness = () => {
+    console.log("İşletme Sahiplenildi: ", placeDetail?.result.name);
+  };
 
   return (
-    <FlatList
-      ListHeaderComponent={() => (
-        <>
-          {/* İşletme Kapak Fotoğrafı */}
-          <Image
-            source={{
-              uri: business?.image,
-            }}
-            style={styles.image}
-          />
+    <View style={styles.container}>
+      <FlatList
+        ListHeaderComponent={() => (
+          <>
+            <View style={styles.carouselContainer}>
+              {placeDetail?.result.photoUrls &&
+              placeDetail?.result.photoUrls.length > 0 ? (
+                <>
+                  <Carousel
+                    data={placeDetail?.result.photoUrls || []}
+                    renderItem={renderImageItem}
+                    sliderWidth={Dimensions.get("window").width}
+                    itemWidth={Dimensions.get("window").width - 40}
+                    vertical={false}
+                    layout="default"
+                    loop={false} // Loop KAPATILDI
+                    onSnapToItem={(index) => {
+                      if (activeSlideRef.current !== index) {
+                        activeSlideRef.current = index;
+                        console.log("Güncellenen Slide:", index);
+                        setActiveSlide(index);
+                      }
+                    }}
+                  />
 
-          <View style={styles.detailContainer}>
-            <Text style={styles.title}>{business?.name}</Text>
-            <Text style={styles.address}>{business?.address}</Text>
-            <Text style={styles.description}>{business?.description}</Text>
-            <Text style={styles.workingHours}>
-              🕒 Çalışma Saatleri: {business?.workingHours}
-            </Text>
-            <View style={styles.rowContainer}>
-              <Text style={styles.rating}>
-                ⭐ {business?.rating} / 5 ({business?.reviewCount} oy)
-              </Text>
-              <Text style={styles.distance}>📍 {business?.distance}</Text>
-              <Text
-                style={[
-                  styles.status,
-                  { color: business?.isOpen ? "green" : "red" },
-                ]}
-              >
-                {business?.isOpen ? "Açık" : "Kapalı"}
-              </Text>
+                  <Pagination
+                    dotsLength={placeDetail?.result.photoUrls.length || 0}
+                    activeDotIndex={activeSlide}
+                    containerStyle={{ paddingVertical: 10 }}
+                    dotStyle={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: 5,
+                      marginHorizontal: 8,
+                      backgroundColor: "#FFA500",
+                    }}
+                    inactiveDotStyle={{
+                      backgroundColor: "#C4C4C4",
+                    }}
+                    inactiveDotOpacity={0.4}
+                    inactiveDotScale={0.8}
+                  />
+                </>
+              ) : (
+                <Image
+                  source={{ uri: "https://via.placeholder.com/400" }}
+                  style={styles.carouselImage}
+                />
+              )}
             </View>
 
-            {/* Telefon Numarası */}
-            <TouchableOpacity
-              onPress={() => Linking.openURL(`tel:${business?.phone}`)}
-              style={styles.phoneButton}
-            >
-              <Text style={styles.phoneButtonText}>📞 Telefonla Ara</Text>
-            </TouchableOpacity>
-          </View>
+            <View style={styles.detailContainer}>
+              <Text style={styles.title}>{placeDetail?.result.name}</Text>
+              <Text style={styles.address}>{placeDetail?.result.vicinity}</Text>
+              <View style={styles.rowContainer}>
+                <Text style={styles.rating}>
+                  ⭐ {placeDetail?.result.rating} / 5 (
+                  {placeDetail?.result.user_ratings_total} oy)
+                </Text>
+              </View>
+              {placeDetail?.result.formatted_phone_number && (
+                <TouchableOpacity
+                  onPress={() =>
+                    Linking.openURL(
+                      `tel:${placeDetail?.result.formatted_phone_number}`
+                    )
+                  }
+                  style={styles.callButton}
+                >
+                  <Text style={styles.callButtonText}>📞 Ara</Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity
+                onPress={() =>
+                  Linking.openURL(
+                    `https://www.google.com/maps/search/?api=1&query=${placeDetail?.result.geometry.location.lat},${placeDetail?.result.geometry.location.lng}`
+                  )
+                }
+                style={styles.mapButton}
+              >
+                <Text style={styles.mapButtonText}>📍 Google Maps'te Aç</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleClaimBusiness}
+                style={styles.claimButton}
+              >
+                <Text style={styles.claimButtonText}>
+                  🏢 İşletmeye Sahiplen
+                </Text>
+              </TouchableOpacity>
+            </View>
 
-          {/* Harita */}
-          <MapView
-            style={styles.map}
-            initialRegion={{
-              latitude: business?.latitude,
-              longitude: business?.longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            }}
-          >
-            <Marker
-              coordinate={{
-                latitude: business?.latitude,
-                longitude: business?.longitude,
+            <MapView
+              style={styles.map}
+              initialRegion={{
+                latitude: placeDetail?.result.geometry.location.lat || 0,
+                longitude: placeDetail?.result.geometry.location.lng || 0,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
               }}
-              title={business?.name}
-            />
-          </MapView>
-        </>
-      )}
-      data={reviews}
-      keyExtractor={(item, index) => index.toString()}
-      renderItem={({ item }) => (
-        <View style={styles.reviewCard}>
-          <Text style={styles.reviewAuthor}>{item.author_name}</Text>
-          <Text style={styles.reviewRating}>⭐ {item.rating} / 5</Text>
-          <Text style={styles.reviewText}>{item.text}</Text>
-        </View>
-      )}
-    />
+            >
+              <Marker
+                coordinate={{
+                  latitude: placeDetail?.result.geometry.location.lat || 0,
+                  longitude: placeDetail?.result.geometry.location.lng || 0,
+                }}
+                title={placeDetail?.result.name}
+              />
+            </MapView>
+          </>
+        )}
+        data={placeDetail?.result.reviews || []}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.reviewCard}>
+            <Text style={styles.reviewAuthor}>{item.author_name}</Text>
+            <Text style={styles.reviewRating}>⭐ {item.rating} / 5</Text>
+            <Text style={styles.reviewText}>{item.text}</Text>
+          </View>
+        )}
+      />
+    </View>
   );
 };
 
@@ -132,11 +184,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F5F5F5",
   },
-  image: {
-    width: "100%",
-    height: 220,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+  carouselContainer: {
+    height: 300,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  carouselImage: {
+    width: Dimensions.get("window").width - 40,
+    height: 300,
+    borderRadius: 10,
+    alignSelf: "center",
+    resizeMode: "cover",
   },
   detailContainer: {
     padding: 15,
@@ -154,48 +213,11 @@ const styles = StyleSheet.create({
     color: "gray",
     marginBottom: 5,
   },
-  description: {
-    fontSize: 16,
-    marginTop: 5,
-  },
-  workingHours: {
-    fontSize: 14,
-    marginTop: 5,
-    color: "#555",
-  },
-  rowContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  rating: {
-    fontSize: 16,
-  },
-  distance: {
-    fontSize: 14,
-    color: "#555",
-  },
-  status: {
-    fontSize: 16,
+  reviewTitle: {
+    fontSize: 20,
     fontWeight: "bold",
-  },
-  phoneButton: {
-    padding: 12,
-    backgroundColor: "#FFA500",
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  phoneButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  map: {
-    width: "90%",
-    height: 200,
-    alignSelf: "center",
-    borderRadius: 10,
-    marginTop: 15,
+    marginTop: 20,
+    paddingHorizontal: 10,
   },
   reviewCard: {
     padding: 10,
@@ -206,12 +228,70 @@ const styles = StyleSheet.create({
   },
   reviewAuthor: {
     fontWeight: "bold",
+    fontSize: 16,
   },
   reviewRating: {
     fontSize: 16,
+    color: "#FFA500",
   },
   reviewText: {
     marginTop: 5,
+    fontSize: 14,
+    color: "#555",
+  },
+  rowContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  rating: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#FFA500",
+  },
+  callButton: {
+    padding: 12,
+    backgroundColor: "#4CAF50",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  callButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  mapButton: {
+    padding: 12,
+    backgroundColor: "#2196F3",
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  mapButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  claimButton: {
+    padding: 12,
+    backgroundColor: "#FF9800",
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  claimButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  map: {
+    width: "100%",
+    height: 300,
+    borderRadius: 10,
+    marginTop: 15,
+  },
+  loader: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
