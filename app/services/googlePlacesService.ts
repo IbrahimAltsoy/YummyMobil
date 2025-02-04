@@ -5,14 +5,16 @@ import { PlaceDetailResult } from "../models/googlePlaces/PlaceDetailResult";
 
 const GooglePlacesService = {
   async getNearbyPlaces(
+    category: string,
     latitude: number,
-    longitude: number
+    longitude: number,
+    radius: number
   ): Promise<GoogleNearPlaces[]> {
     try {
       const response = await axios.get(
         `${API_URL.API_BASE_URL}/test/get-nearby-places`,
         {
-          params: { latitude, longitude },
+          params: { category, latitude, longitude, radius },
         }
       );
 
@@ -33,10 +35,28 @@ const GooglePlacesService = {
       throw new Error("Yakındaki mekanları alırken bir hata oluştu.");
     }
   },
-  async getPlaceDetails(place_Id: string): Promise<PlaceDetailResult | null> {
+  // async getPlaceDetails(place_Id: string): Promise<PlaceDetailResult | null> {
+  //   try {
+  //     const response = await axios.get<PlaceDetailResult>(
+  //       `${API_URL.API_BASE_URL}/test/get-business-detail/${place_Id}`
+  //     );
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error("İşletme detayları alınırken hata oluştu:", error);
+  //     return null;
+  //   }
+  // },
+  async getPlaceDetails(
+    place_Id: string,
+    latitude: number,
+    longitude: number
+  ): Promise<PlaceDetailResult | null> {
     try {
-      const response = await axios.get<PlaceDetailResult>(
-        `${API_URL.API_BASE_URL}/test/get-business-detail/${place_Id}`
+      const response = await axios.get(
+        `${API_URL.API_BASE_URL}/test/get-business-detail/${place_Id}`,
+        {
+          params: { latitude, longitude }, // Konum parametrelerini API'ye gönderiyoruz
+        }
       );
       return response.data;
     } catch (error) {

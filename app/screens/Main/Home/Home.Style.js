@@ -83,4 +83,19 @@ export default StyleSheet.create({
     color: "red",
     marginTop: 10,
   },
+  input: {
+    color: "#FFB800",
+    backgroundColor: "white",
+    borderRadius: 10,
+    height: 40,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    fontSize: 16,
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    marginTop: 20,
+    marginBottom: 20,
+  },
 });

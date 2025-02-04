@@ -1,55 +1,88 @@
 import React, { useState, useEffect } from "react";
-import { View, FlatList, ActivityIndicator, Text } from "react-native";
+import {
+  View,
+  FlatList,
+  ActivityIndicator,
+  Text,
+  Modal,
+  Button,
+  TouchableOpacity,
+} from "react-native";
 import styles from "./Home.Style";
-import HeaderSection from "../../../testScreen/HeaderSection";
-import CategoryFilter from "../../../testScreen/CategoryFilter";
+import SearchFilterSection from "@/app/components/SearchFilterSection/SearchFilterSection";
 import YCard from "@/app/components/YCard/YCard";
 import GooglePlacesService from "../../../services/googlePlacesService";
-import { GoogleNearPlaces } from "../../../models/googlePlaces/googleNearPlaces"; // Model
-import SearchFilterSection from "@/app/components/SearchFilterSection/SearchFilterSection";
+import { GoogleNearPlaces } from "../../../models/googlePlaces/googleNearPlaces";
 import { useNavigation } from "@react-navigation/native";
+import * as Location from "expo-location";
+import Slider from "@react-native-community/slider";
+import LottieView from "lottie-react-native";
 
 const HomeScreen: React.FC = () => {
   const navigation: any | undefined = useNavigation();
+  const [placesData, setPlacesData] = useState<GoogleNearPlaces[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedTypes, setSelectedTypes] = useState(["restaurant"]); // Varsayılan "restaurant"
+  const [radius, setRadius] = useState(1000); // API'ye gidecek gerçek değer
+  const [tempRadius, setTempRadius] = useState(1000); // Kullanıcının değiştirdiği geçici değer
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const [placesData, setPlacesData] = useState<GoogleNearPlaces[]>([]); // Veriler
-  const [loading, setLoading] = useState<boolean>(false); // Yüklenme durumu
-  const [error, setError] = useState<string | null>(null); // Hata mesajı
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  // 📌 Kategori değiştiğinde çağrılacak fonksiyon
+  const handleCategoryChange = async (types: any) => {
+    setSelectedTypes(types);
+    await fetchPlaces(types, radius);
+  };
 
-  // Verileri API'den çekmek için fonksiyon
-  const fetchPlaces = async () => {
+  // 📌 API'den işletmeleri getirme fonksiyonu
+  const fetchPlaces = async (
+    categoryTypes: string | string[],
+    radius: number
+  ) => {
     try {
-      setLoading(true); // Yüklenme başladığında
-      setError(null); // Önceki hatayı temizle
+      setLoading(true);
+      setError(null);
 
-      const latitude = 38.4192; // Örnek konum (İzmir)
-      const longitude = 27.1287;
+      if (!categoryTypes) {
+        categoryTypes = ["restaurant"];
+      } else if (typeof categoryTypes === "string") {
+        categoryTypes = [categoryTypes];
+      }
 
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.log("❌ Konum izni verilmedi.");
+        setLoading(false);
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Highest,
+        timeInterval: 2000,
+      });
+
+      const selectedCategory = categoryTypes.join(",");
       const data = await GooglePlacesService.getNearbyPlaces(
-        latitude,
-        longitude
+        selectedCategory,
+        location.coords.latitude,
+        location.coords.longitude,
+        radius // 📌 Kullanıcının seçtiği radius değeri burada kullanılıyor
       );
-      setPlacesData(data); // Verileri kaydet
+
+      setPlacesData(data);
     } catch (err: any) {
       setError("Veriler alınırken bir hata oluştu. Lütfen tekrar deneyin.");
     } finally {
-      setLoading(false); // Yüklenme bittiğinde
+      setLoading(false);
     }
   };
 
-  // İlk yüklemede API çağrısı
-  useEffect(() => {
-    fetchPlaces();
-  }, []);
+  // 📌 İlk yüklemede varsayılan kategori ("restaurant") ile API çağrısı
+
   const handleBusinessDetails = (place_id: string) => {
     navigation.navigate("businessdetails", { place_id });
   };
-  const handleCategorySelect = (category: any) => {
-    setSelectedCategory(category);
-    console.log("Seçilen Kategori:", category);
-    // Burada kategoriye göre filtreleme yapabiliriz.
-  };
+
   const renderCard = ({ item }: { item: GoogleNearPlaces }) => (
     <YCard
       name={item.name}
@@ -65,19 +98,183 @@ const HomeScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* <HeaderSection onNearbyPress={() => {}} onSearchPress={() => {}} />
-      <CategoryFilter
-        onCategorySelect={(category: any) => console.log(category)}
-      /> */}
-      <SearchFilterSection
-        onNearbyPress={() => console.log("Yakınımdaki İşletmeler")}
-        onSearchPress={() => console.log("İşletme Ara")}
-        onCategorySelect={handleCategorySelect}
-      />
-      {loading && <ActivityIndicator size="large" color="#000" />}
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      <SearchFilterSection onCategorySelect={handleCategoryChange} />
+      <Modal visible={modalVisible} animationType="slide" transparent={true}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "white",
+              padding: 20,
+              borderRadius: 15,
+              width: "85%",
+              elevation: 5,
+            }}
+          >
+            {/* Başlık */}
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 10,
+              }}
+            >
+              <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+                📍 Yakınlık Ayarı
+              </Text>
+            </View>
 
-      {!loading && !error && (
+            {/* Slider */}
+            <Slider
+              style={{ width: "100%", marginVertical: 10 }}
+              minimumValue={500}
+              maximumValue={5000}
+              step={100}
+              value={tempRadius} // Geçici state ile değiştiriyoruz
+              onValueChange={(value) => setTempRadius(value)} // Kullanıcı kaydırdıkça güncelleniyor ama istek atmıyor
+            />
+
+            {/* Seçilen Çap */}
+            {/* <Text
+              style={{ textAlign: "center", fontSize: 16, marginBottom: 15 }}
+            >
+              Seçilen Çap: {tempRadius} metre
+            </Text> */}
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 10,
+              }}
+            >
+              <Text
+                style={{ fontSize: 20, fontWeight: "bold", marginRight: 8 }}
+              >
+                🔎
+              </Text>
+              <Text style={{ fontSize: 16, fontWeight: "bold", color: "#444" }}>
+                Yakınlık Mesafesi {tempRadius} metre
+              </Text>
+            </View>
+
+            {/* Butonlar */}
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
+            >
+              {/* İptal Butonu */}
+              <TouchableOpacity
+                style={{
+                  flex: 1,
+                  backgroundColor: "#d9534f",
+                  padding: 10,
+                  borderRadius: 10,
+                  marginRight: 5,
+                }}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text
+                  style={{ color: "white", fontSize: 16, textAlign: "center" }}
+                >
+                  İptal
+                </Text>
+              </TouchableOpacity>
+
+              {/* Uygula Butonu */}
+              <TouchableOpacity
+                style={{
+                  flex: 1,
+                  backgroundColor: "#FFB800",
+                  padding: 10,
+                  borderRadius: 10,
+                  marginLeft: 5,
+                }}
+                onPress={() => {
+                  setRadius(tempRadius); // Asıl radius'u güncelle
+                  setModalVisible(false); // Modalı kapat
+                  fetchPlaces(selectedTypes, tempRadius); // API çağrısı sadece burada yapılıyor
+                }}
+              >
+                <Text
+                  style={{ color: "white", fontSize: 16, textAlign: "center" }}
+                >
+                  Uygula
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          paddingHorizontal: 15,
+          marginBottom: 10,
+        }}
+      >
+        {/* 📌 Sol Tarafa Filtreleme Butonu */}
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#FFB800",
+            padding: 10,
+            borderRadius: 50,
+            elevation: 5,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.2,
+            shadowRadius: 3,
+          }}
+          onPress={() => setModalVisible(true)}
+        >
+          <Text style={{ color: "white", fontSize: 16 }}>🔍</Text>
+        </TouchableOpacity>
+
+        {/* 📌 Sağ Tarafa Uygulama Açıklaması */}
+        <Text
+          style={{
+            fontSize: 14,
+            fontWeight: "bold",
+            color: "#444",
+            flex: 1,
+            textAlign: "right",
+          }}
+        >
+          👋 Hızlıca yakındaki işletmeleri keşfet!
+        </Text>
+      </View>
+
+      {loading ? (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <LottieView
+            source={require("../../../assets/json/loading.json")} // Buraya bir animasyon ekleyebilirsin!
+            autoPlay
+            loop
+            style={{ width: 150, height: 150 }}
+          />
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: "bold",
+              color: "#444",
+              marginTop: 10,
+            }}
+          >
+            Mekanları senin için keşfediyoruz...
+          </Text>
+        </View>
+      ) : (
         <FlatList
           data={placesData}
           keyExtractor={(item) => item.place_id}

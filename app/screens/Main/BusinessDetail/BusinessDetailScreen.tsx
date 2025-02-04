@@ -1,50 +1,82 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
+  ScrollView,
   Image,
+  Linking,
   FlatList,
   TouchableOpacity,
-  Linking,
   StyleSheet,
   ActivityIndicator,
-  Dimensions,
-  ScrollView,
+  Button,
 } from "react-native";
-import { useRoute } from "@react-navigation/native";
 import MapView, { Marker } from "react-native-maps";
-import PlaceService from "../../../services/googlePlacesService";
-import { PlaceDetailResult } from "../../../models/googlePlaces/PlaceDetailResult";
 import Carousel from "react-native-snap-carousel";
-import { Pagination } from "react-native-snap-carousel";
+import { FontAwesome } from "@expo/vector-icons";
+import { useRoute } from "@react-navigation/native";
+import { PlaceDetailResult } from "@/app/models/googlePlaces/PlaceDetailResult";
+import PlaceService from "../../../services/googlePlacesService";
+import * as Location from "expo-location";
 
-const BusinessDetailScreen = () => {
+const renderReviewItem = ({ item }: any) => (
+  <View style={styles.reviewItem}>
+    <Text style={styles.reviewAuthor}>
+      {item.author_Name} - ⭐{item.rating}
+    </Text>
+    <Text>{item.text}</Text>
+    <Text style={styles.reviewTime}>{item.relative_Time_Description}</Text>
+  </View>
+);
+const PlaceDetailScreen = () => {
   const route = useRoute();
-  const activeSlideRef = useRef(0);
-  const [activeSlide, setActiveSlide] = useState(0);
-
-  const { place_id } = route.params as { place_id: string };
   const [placeDetail, setPlaceDetail] = useState<PlaceDetailResult | null>(
     null
   );
   const [loading, setLoading] = useState<boolean>(true);
-
+  const { place_id } = route.params as { place_id: string };
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const data = await PlaceService.getPlaceDetails(place_id);
+      //
+
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Konum izni reddedildi.");
+        setLoading(false);
+        return;
+      }
+
+      let location: any = await Promise.race([
+        Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Highest,
+
+          timeInterval: 1000,
+        }),
+        new Promise((_, reject) =>
+          setTimeout(
+            () => reject(new Error("Konum zaman aşımına uğradı")),
+            8000
+          )
+        ),
+      ]);
+
+      //
+      const data = await PlaceService.getPlaceDetails(
+        place_id,
+        location.coords.latitude,
+        location.coords.longitude
+      );
       setPlaceDetail(data);
       setLoading(false);
     };
     fetchData();
   }, [place_id]);
-
   if (loading) {
     return (
       <ActivityIndicator size="large" color="blue" style={styles.loader} />
     );
   }
-
   const renderImageItem = ({ item }: { item: string }) => (
     <Image source={{ uri: item }} style={styles.carouselImage} />
   );
@@ -52,151 +84,192 @@ const BusinessDetailScreen = () => {
   const handleClaimBusiness = () => {
     console.log("İşletme Sahiplenildi: ", placeDetail?.result.name);
   };
+  const openInMaps = () => {
+    const url = `https://www.google.com/maps/search/?api=1&query=${placeDetail?.result.geometry.location.lat},${placeDetail?.result.geometry.location.lng}`;
+    Linking.openURL(url);
+  };
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        ListHeaderComponent={() => (
-          <>
-            <View style={styles.carouselContainer}>
-              {placeDetail?.result.photoUrls &&
-              placeDetail?.result.photoUrls.length > 0 ? (
-                <>
-                  <Carousel
-                    data={placeDetail?.result.photoUrls || []}
-                    renderItem={renderImageItem}
-                    sliderWidth={Dimensions.get("window").width}
-                    itemWidth={Dimensions.get("window").width - 40}
-                    vertical={false}
-                    layout="default"
-                    loop={false} // Loop KAPATILDI
-                    onSnapToItem={(index) => {
-                      if (activeSlideRef.current !== index) {
-                        activeSlideRef.current = index;
-                        console.log("Güncellenen Slide:", index);
-                        setActiveSlide(index);
-                      }
-                    }}
-                  />
-
-                  <Pagination
-                    dotsLength={placeDetail?.result.photoUrls.length || 0}
-                    activeDotIndex={activeSlide}
-                    containerStyle={{ paddingVertical: 10 }}
-                    dotStyle={{
-                      width: 10,
-                      height: 10,
-                      borderRadius: 5,
-                      marginHorizontal: 8,
-                      backgroundColor: "#FFA500",
-                    }}
-                    inactiveDotStyle={{
-                      backgroundColor: "#C4C4C4",
-                    }}
-                    inactiveDotOpacity={0.4}
-                    inactiveDotScale={0.8}
-                  />
-                </>
-              ) : (
-                <Image
-                  source={{ uri: "https://via.placeholder.com/400" }}
-                  style={styles.carouselImage}
-                />
-              )}
-            </View>
-
-            <View style={styles.detailContainer}>
-              <Text style={styles.title}>{placeDetail?.result.name}</Text>
-              <Text style={styles.address}>{placeDetail?.result.vicinity}</Text>
-              <View style={styles.rowContainer}>
-                <Text style={styles.rating}>
-                  ⭐ {placeDetail?.result.rating} / 5 (
-                  {placeDetail?.result.user_ratings_total} oy)
-                </Text>
-              </View>
-              {placeDetail?.result.formatted_phone_number && (
-                <TouchableOpacity
-                  onPress={() =>
-                    Linking.openURL(
-                      `tel:${placeDetail?.result.formatted_phone_number}`
-                    )
-                  }
-                  style={styles.callButton}
-                >
-                  <Text style={styles.callButtonText}>📞 Ara</Text>
-                </TouchableOpacity>
-              )}
-              <TouchableOpacity
-                onPress={() =>
-                  Linking.openURL(
-                    `https://www.google.com/maps/search/?api=1&query=${placeDetail?.result.geometry.location.lat},${placeDetail?.result.geometry.location.lng}`
-                  )
-                }
-                style={styles.mapButton}
-              >
-                <Text style={styles.mapButtonText}>📍 Google Maps'te Aç</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleClaimBusiness}
-                style={styles.claimButton}
-              >
-                <Text style={styles.claimButtonText}>
-                  🏢 İşletmeye Sahiplen
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <MapView
-              style={styles.map}
-              initialRegion={{
-                latitude: placeDetail?.result.geometry.location.lat || 0,
-                longitude: placeDetail?.result.geometry.location.lng || 0,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-              }}
-            >
-              <Marker
-                coordinate={{
-                  latitude: placeDetail?.result.geometry.location.lat || 0,
-                  longitude: placeDetail?.result.geometry.location.lng || 0,
-                }}
-                title={placeDetail?.result.name}
-              />
-            </MapView>
-          </>
-        )}
-        data={placeDetail?.result.reviews || []}
-        keyExtractor={(item, index) => index.toString()}
+    <ScrollView style={styles.container}>
+      <Carousel
+        data={placeDetail?.result.photoUrls || []}
         renderItem={({ item }) => (
-          <View style={styles.reviewCard}>
-            <Text style={styles.reviewAuthor}>{item.author_name}</Text>
-            <Text style={styles.reviewRating}>⭐ {item.rating} / 5</Text>
-            <Text style={styles.reviewText}>{item.text}</Text>
-          </View>
+          <Image source={{ uri: item }} style={styles.carouselImage} />
         )}
+        sliderWidth={400}
+        itemWidth={300}
+        layout="default"
+        loop
+        vertical={false}
       />
-    </View>
+
+      <Text style={styles.title}>{placeDetail?.result.name} </Text>
+
+      <View style={styles.detailContainer}>
+        <Text style={styles.address}>
+          {placeDetail?.result.vicinity
+            ? placeDetail?.result.vicinity
+            : "Yokkk"}
+        </Text>
+
+        <View style={styles.rowContainer}>
+          <Text
+            style={
+              placeDetail?.result.opening_Hours?.open_Now
+                ? styles.openStatus
+                : styles.closedStatus
+            }
+          >
+            {placeDetail?.result.opening_Hours?.open_Now
+              ? "🟢 (Açık)"
+              : "🔴 (Kapalı)"}
+          </Text>
+          {placeDetail?.result.rating ? (
+            <Text style={styles.rating}>
+              ⭐ {placeDetail?.result.rating} / 5 (
+              {placeDetail?.result.user_Ratings_Total} oy)
+            </Text>
+          ) : (
+            <Text style={styles.rating}>⭐ Puanlama Yok</Text>
+          )}
+        </View>
+      </View>
+
+      <View style={styles.contactContainer}>
+        <TouchableOpacity
+          onPress={() =>
+            placeDetail?.result?.formatted_Phone_Number
+              ? Linking.openURL(
+                  `tel:${placeDetail?.result.formatted_Phone_Number}`
+                )
+              : null
+          }
+          style={styles.phoneButton}
+          disabled={!placeDetail?.result?.formatted_Phone_Number} // Eğer numara yoksa buton devre dışı kalır
+        >
+          <Text style={styles.phoneButtonText}>
+            📞 {placeDetail?.result?.formatted_Phone_Number || "Yok"}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() =>
+            placeDetail?.result?.website
+              ? Linking.openURL(placeDetail?.result.website)
+              : null
+          }
+          style={styles.websiteButton}
+          disabled={!placeDetail?.result?.website} // Eğer site bilgisi yoksa buton devre dışı kalır
+        >
+          <Text style={styles.websiteButtonText}>
+            🌍{" "}
+            {placeDetail?.result?.website ? "Siteyi Gör" : "Site Bilgisi Yok"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.socialMediaContainer}>
+        <TouchableOpacity
+          onPress={() =>
+            Linking.openURL(
+              placeDetail?.result?.social_Media?.instagram
+                ? ""
+                : "Instagram bilgisi bulunmamaktadır."
+            )
+          }
+        >
+          <FontAwesome name="instagram" size={24} color="#E4405F" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            Linking.openURL(
+              placeDetail?.result.social_Media?.facebook
+                ? ""
+                : "Facebook bilgisi bulunmamaktadır."
+            )
+          }
+        >
+          <FontAwesome name="facebook" size={24} color="#1877F2" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            Linking.openURL(
+              placeDetail?.result.social_Media?.twitter
+                ? ""
+                : "Twitter bilgisi bulunmamaktadır."
+            )
+          }
+        >
+          <FontAwesome name="twitter" size={24} color="#1DA1F2" />
+        </TouchableOpacity>
+      </View>
+
+      <MapView
+        style={styles.map}
+        initialRegion={{
+          latitude: placeDetail?.result.geometry.location.lat || 0,
+          longitude: placeDetail?.result.geometry.location.lng || 0,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        }}
+      >
+        <Marker
+          coordinate={{
+            latitude: placeDetail?.result.geometry.location.lat || 0,
+            longitude: placeDetail?.result.geometry.location.lng || 0,
+          }}
+          title={placeDetail?.result?.name}
+        />
+      </MapView>
+
+      <TouchableOpacity onPress={openInMaps} style={styles.button}>
+        <Text style={styles.buttonText}>
+          📍 İşletmeye Git ({placeDetail?.result.distance.toFixed(2)} km)
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={[styles.button, styles.claimButton]}>
+        <Text style={styles.buttonText}>İşletmeyi Sahiplen</Text>
+      </TouchableOpacity>
+      <View>
+        <Text style={styles.title}>
+          Yorumlar({placeDetail?.result.reviews?.length})
+        </Text>
+        <FlatList
+          data={placeDetail?.result.reviews || []}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={renderReviewItem}
+          scrollEnabled={false}
+        />
+      </View>
+    </ScrollView>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    padding: 16,
+    backgroundColor: "#fff",
   },
-  carouselContainer: {
-    height: 300,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 15,
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginTop: 16,
+    color: "#FFB800",
   },
-  carouselImage: {
-    width: Dimensions.get("window").width - 40,
-    height: 300,
-    borderRadius: 10,
-    alignSelf: "center",
-    resizeMode: "cover",
+  subtitle: {
+    color: "gray",
+    marginBottom: 16,
   },
+  openStatus: {
+    color: "green",
+    fontSize: 18,
+  },
+  closedStatus: {
+    color: "red",
+    fontSize: 18,
+  },
+
   detailContainer: {
     padding: 15,
     backgroundColor: "#FFFFFF",
@@ -204,89 +277,116 @@ const styles = StyleSheet.create({
     margin: 10,
     elevation: 5,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#333",
-  },
   address: {
-    color: "gray",
-    marginBottom: 5,
-  },
-  reviewTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginTop: 20,
-    paddingHorizontal: 10,
-  },
-  reviewCard: {
-    padding: 10,
-    backgroundColor: "#FFF3E0",
-    borderRadius: 8,
-    marginBottom: 10,
-    marginHorizontal: 10,
-  },
-  reviewAuthor: {
-    fontWeight: "bold",
     fontSize: 16,
-  },
-  reviewRating: {
-    fontSize: 16,
-    color: "#FFA500",
-  },
-  reviewText: {
-    marginTop: 5,
-    fontSize: 14,
     color: "#555",
+    fontWeight: "500",
+    marginBottom: 8,
   },
   rowContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginVertical: 10,
+    marginVertical: 5,
   },
   rating: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#FFA500",
   },
-  callButton: {
-    padding: 12,
+  reviewCount: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#007BFF",
+  },
+  // openStatus: {
+  //   fontSize: 16,
+  //   fontWeight: "bold",
+  //   color: "#28A745",
+  // },
+  distance: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#6C757D",
+    marginTop: 5,
+  },
+
+  contactContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  phoneButton: {
     backgroundColor: "#4CAF50",
+    padding: 10,
     borderRadius: 8,
     alignItems: "center",
+    flex: 1,
+    marginRight: 10,
   },
-  callButtonText: {
+  phoneButtonText: {
     color: "white",
     fontWeight: "bold",
+    textAlign: "center",
   },
-  mapButton: {
-    padding: 12,
-    backgroundColor: "#2196F3",
+  websiteButton: {
+    backgroundColor: "#FFB800",
+    padding: 10,
     borderRadius: 8,
     alignItems: "center",
-    marginTop: 10,
+    flex: 1,
+    marginLeft: 10,
   },
-  mapButtonText: {
+  websiteButtonText: {
     color: "white",
     fontWeight: "bold",
+    textAlign: "center",
   },
-  claimButton: {
-    padding: 12,
-    backgroundColor: "#FF9800",
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 10,
+
+  link: {
+    color: "#FFB800",
   },
-  claimButtonText: {
-    color: "white",
-    fontWeight: "bold",
+  socialMediaContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginVertical: 16,
   },
   map: {
-    width: "100%",
-    height: 300,
-    borderRadius: 10,
-    marginTop: 15,
+    height: 200,
+    marginVertical: 16,
+  },
+  button: {
+    backgroundColor: "#28a745",
+    padding: 10,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  claimButton: {
+    backgroundColor: "#FFB800",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+  },
+  carouselImage: {
+    width: 300,
+    height: 200,
+    borderRadius: 8,
+  },
+  reviewItem: {
+    marginTop: 10,
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: "#ddd",
+  },
+  reviewAuthor: {
+    fontWeight: "bold",
+  },
+  reviewTime: {
+    color: "gray",
   },
   loader: {
     flex: 1,
@@ -294,5 +394,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
-
-export default BusinessDetailScreen;
+export default PlaceDetailScreen;
