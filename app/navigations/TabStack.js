@@ -1,9 +1,10 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "../screens/Main/Home/HomeScreen";
-import ProfileScreen from "../screens/Main/Profile/ProfileScreen";
+import EventScreen from "../screens/Main/Event/EventScreen";
 import ServiceScreen from "../screens/Main/Service/ServiceScreen";
-import { Ionicons } from "@expo/vector-icons"; // İkonları import ediyoruz.
+import { Ionicons } from "@expo/vector-icons";
+import { Text } from "react-native";
 
 const Tab = createBottomTabNavigator();
 
@@ -16,25 +17,57 @@ const TabStack = () => (
 
         if (route.name === "Home") {
           iconName = focused ? "home" : "home-outline";
-        } else if (route.name === "Profile") {
-          iconName = focused ? "person" : "person-outline";
+        } else if (route.name === "Event") {
+          iconName = focused ? "calendar" : "calendar-outline";
         } else if (route.name === "Service") {
           iconName = focused ? "settings" : "settings-outline";
         }
 
-        // Ionicons ile ikon oluşturuluyor
-        return <Ionicons name={iconName} size={size} color={color} />;
+        return (
+          <Ionicons
+            name={iconName}
+            size={focused ? size + 2 : size}
+            color={color}
+          />
+        );
       },
-      tabBarActiveTintColor: "tomato", // Aktif sekmenin rengi
-      tabBarInactiveTintColor: "gray", // İnaktif sekmenin rengi
+      tabBarLabel: ({ focused, color }) => (
+        <Text
+          style={{
+            fontSize: 12,
+            fontWeight: focused ? "bold" : "normal",
+            color,
+          }}
+        >
+          {route.name}
+        </Text>
+      ),
+      tabBarStyle: {
+        backgroundColor: "#fff",
+        height: 60,
+        borderTopLeftRadius: 5,
+        borderTopRightRadius: 5,
+        elevation: 5,
+        shadowColor: "#000",
+        shadowOpacity: 0.1,
+        shadowOffset: { width: 0, height: -2 },
+      },
+      tabBarActiveTintColor: "#FF5733",
+      tabBarInactiveTintColor: "#8E8E8E",
     })}
   >
     <Tab.Screen
       name="Home"
       options={{ headerShown: false }}
+      statusBarStyle="auto"
       component={HomeScreen}
     />
-    <Tab.Screen name="Profile" component={ProfileScreen} />
+    <Tab.Screen
+      name="Event"
+      statusBarStyle="auto"
+      component={EventScreen}
+      options={{ headerShown: false }}
+    />
     <Tab.Screen name="Service" component={ServiceScreen} />
   </Tab.Navigator>
 );

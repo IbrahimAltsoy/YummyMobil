@@ -1,8 +1,5 @@
 import React from "react";
-import HomeScreen from "../screens/Main/Home/HomeScreen";
-import { createDrawerNavigator } from "@react-navigation/drawer";
-import AuthContext, { AuthProvider } from "../context/AuthContext";
-import ProfileScreen from "../screens/Main/Profile/ProfileScreen";
+import EventScreen from "../screens/Main/Event/EventScreen";
 import ServiceScreen from "../screens/Main/Service/ServiceScreen";
 import TabStack from "./TabStack";
 import BusinessDetailScreen from "../screens/Main/BusinessDetail/BusinessDetailScreen";
@@ -13,14 +10,14 @@ const Stack = createStackNavigator();
 
 const MainStack = () => (
   // <AuthProvider>
-  <Stack.Navigator initialRouteName="Home">
+  <Stack.Navigator initialRouteName="TabStack">
     <Stack.Screen
-      name="Home"
-      component={HomeScreen}
+      name="TabStack"
+      component={TabStack}
       options={{ headerShown: false }}
     />
 
-    <Stack.Screen name="profile" component={ProfileScreen} />
+    <Stack.Screen name="event" component={EventScreen} />
     <Stack.Screen name="service" component={ServiceScreen} />
     <Stack.Screen
       name="businessdetails"
