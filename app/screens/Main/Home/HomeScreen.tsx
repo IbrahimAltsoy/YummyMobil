@@ -17,6 +17,7 @@ import { useNavigation } from "@react-navigation/native";
 import * as Location from "expo-location";
 import Slider from "@react-native-community/slider";
 import LottieView from "lottie-react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const HomeScreen: React.FC = () => {
   const navigation: any | undefined = useNavigation();
@@ -212,45 +213,22 @@ const HomeScreen: React.FC = () => {
           </View>
         </View>
       </Modal>
-
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          paddingHorizontal: 15,
-          marginBottom: 10,
-        }}
-      >
-        {/* 📌 Sol Tarafa Filtreleme Butonu */}
-        <TouchableOpacity
-          style={{
-            backgroundColor: "#FFB800",
-            padding: 10,
-            borderRadius: 50,
-            elevation: 5,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.2,
-            shadowRadius: 3,
-          }}
-          onPress={() => setModalVisible(true)}
-        >
-          <Text style={{ color: "white", fontSize: 16 }}>🔍</Text>
-        </TouchableOpacity>
-
-        {/* 📌 Sağ Tarafa Uygulama Açıklaması */}
-        <Text
-          style={{
-            fontSize: 14,
-            fontWeight: "bold",
-            color: "#444",
-            flex: 1,
-            textAlign: "right",
-          }}
-        >
-          👋 Hızlıca yakındaki işletmeleri keşfet!
-        </Text>
+      <View style={styles.headerContainer}>
+        <View style={styles.leftSection}>
+          {/* 📌 Küçültülmüş ve Daha Minimal Konum Butonu */}
+          <TouchableOpacity
+            style={styles.locationButton}
+            onPress={() => setModalVisible(true)}
+          >
+            <Ionicons name="location-outline" size={18} color="white" />
+          </TouchableOpacity>
+          {/* 📌 Yakındaki işletmeleri keşfet metnini ortaladık */}
+          <View style={styles.textContainer}>
+            <Text style={styles.description}>
+              👋 Yakındaki işletmeleri keşfet!
+            </Text>
+          </View>
+        </View>
       </View>
 
       {loading ? (

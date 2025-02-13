@@ -32,6 +32,13 @@
           "backgroundColor": "#ffffff"
         }
       ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Galeriye erişmek için izin gerekiyor.",
+          "cameraPermission": "Kamerayı kullanmak için izin gerekiyor."
+        }
+      ],
       "expo-secure-store"
     ],
     "experiments": {

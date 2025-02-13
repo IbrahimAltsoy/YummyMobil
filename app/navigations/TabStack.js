@@ -2,9 +2,9 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "../screens/Main/Home/HomeScreen";
 import EventScreen from "../screens/Main/Event/EventScreen";
-import ServiceScreen from "../screens/Main/Service/ServiceScreen";
 import { Ionicons } from "@expo/vector-icons";
 import { Text } from "react-native";
+import ProfileScreen from "../screens/Main/Profile/ProfileScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -19,7 +19,7 @@ const TabStack = () => (
           iconName = focused ? "home" : "home-outline";
         } else if (route.name === "Event") {
           iconName = focused ? "calendar" : "calendar-outline";
-        } else if (route.name === "Service") {
+        } else if (route.name === "profile") {
           iconName = focused ? "settings" : "settings-outline";
         }
 
@@ -68,7 +68,11 @@ const TabStack = () => (
       component={EventScreen}
       options={{ headerShown: false }}
     />
-    <Tab.Screen name="Service" component={ServiceScreen} />
+    <Tab.Screen
+      name="profile"
+      component={ProfileScreen}
+      options={{ headerShown: false }}
+    />
   </Tab.Navigator>
 );
 

@@ -12,84 +12,168 @@ import Icon from "react-native-vector-icons/Ionicons"; // İkonlar için
 // 📌 ENUMLARA GÖRE KATEGORİLERİN TANIMLANMASI
 const categories = [
   {
-    name: "Genel",
-    color: "#FFA500",
+    name: "Yeme & İçme",
+    color: "#F4A261",
     types: [
       { label: "Restoran", value: "restaurant", icon: "restaurant" },
       { label: "Kafe", value: "cafe", icon: "cafe" },
       { label: "Bar", value: "bar", icon: "beer" },
-      { label: "Süpermarket", value: "supermarket", icon: "cart" },
+      { label: "Fırın", value: "bakery", icon: "bread" },
+      { label: "Yemek Dağıtımı", value: "meal_delivery", icon: "fast-food" },
+      { label: "Paket Yemek", value: "meal_takeaway", icon: "cart" },
+      { label: "Süpermarket", value: "supermarket", icon: "cart-outline" },
+      { label: "İçki Mağazası", value: "liquor_store", icon: "wine" },
     ],
   },
   {
-    name: "Eğlence",
-    color: "#8B4513",
+    name: "Ulaşım & Seyahat",
+    color: "#457B9D",
     types: [
-      { label: "Park", value: "park", icon: "leaf" },
-      { label: "Müze", value: "museum", icon: "book" },
-      { label: "Sinema", value: "movie_theater", icon: "videocam" },
-      { label: "Gece Kulübü", value: "night_club", icon: "musical-notes" },
-      { label: "Stadyum", value: "stadium", icon: "football" },
-    ],
-  },
-  {
-    name: "Seyahat",
-    color: "#800080",
-    types: [
-      { label: "Tren İstasyonu", value: "train_station", icon: "train" },
-      { label: "Otobüs Durağı", value: "bus_station", icon: "bus" },
-      { label: "Taksi Durağı", value: "taxi_stand", icon: "car-sport" },
       { label: "Havalimanı", value: "airport", icon: "airplane" },
+      { label: "Otobüs Durağı", value: "bus_station", icon: "bus" },
+      { label: "Tren İstasyonu", value: "train_station", icon: "train" },
+      { label: "Metro İstasyonu", value: "subway_station", icon: "subway" },
+      { label: "Taksi Durağı", value: "taxi_stand", icon: "car-sport" },
       { label: "Araç Kiralama", value: "car_rental", icon: "car" },
       { label: "Otopark", value: "parking", icon: "car-outline" },
+      { label: "Benzin İstasyonu", value: "gas_station", icon: "flame" },
+    ],
+  },
+  {
+    name: "Sağlık",
+    color: "#D32F2F",
+    types: [
+      { label: "Hastane", value: "hospital", icon: "medkit" },
+      { label: "Doktor", value: "doctor", icon: "person" },
+      { label: "Diş Hekimi", value: "dentist", icon: "happy-outline" },
+      { label: "Eczane", value: "pharmacy", icon: "medkit-outline" },
+      { label: "Veteriner", value: "veterinary_care", icon: "paw" },
+      { label: "Fizyoterapist", value: "physiotherapist", icon: "body" },
+    ],
+  },
+  {
+    name: "Alışveriş",
+    color: "#2A9D8F",
+    types: [
+      { label: "Giyim Mağazası", value: "clothing_store", icon: "shirt" },
+      { label: "Ayakkabı Mağazası", value: "shoe_store", icon: "walk" },
+      {
+        label: "Elektronik Mağazası",
+        value: "electronics_store",
+        icon: "phone-portrait",
+      },
+      { label: "Hırdavatçı", value: "hardware_store", icon: "construct" },
+      { label: "Mobilya Mağazası", value: "furniture_store", icon: "bed" },
+      { label: "Kitapçı", value: "book_store", icon: "book" },
+      {
+        label: "Alışveriş Merkezi",
+        value: "shopping_mall",
+        icon: "storefront",
+      },
+      { label: "Bakkal", value: "convenience_store", icon: "basket" },
+    ],
+  },
+  {
+    name: "Kültür & Eğlence",
+    color: "#E76F51",
+    types: [
+      { label: "Müze", value: "museum", icon: "book" },
+      { label: "Sanat Galerisi", value: "art_gallery", icon: "brush" },
+      { label: "Stadyum", value: "stadium", icon: "football" },
+      { label: "Tiyatro", value: "theater", icon: "musical-notes" },
+      { label: "Sinema", value: "movie_theater", icon: "videocam" },
+      { label: "Gece Kulübü", value: "night_club", icon: "musical-notes" },
+      { label: "Lunapark", value: "amusement_park", icon: "sparkles" },
+      { label: "Akvaryum", value: "aquarium", icon: "fish" },
+      { label: "Hayvanat Bahçesi", value: "zoo", icon: "paw" },
+      { label: "Turistik Yer", value: "tourist_attraction", icon: "compass" },
+      { label: "Park", value: "park", icon: "leaf" },
+    ],
+  },
+  {
+    name: "Eğitim",
+    color: "#1D3557",
+    types: [
+      { label: "Okul", value: "school", icon: "school" },
+      { label: "İlkokul", value: "primary_school", icon: "pencil" },
+      {
+        label: "Ortaokul / Lise",
+        value: "secondary_school",
+        icon: "pencil-sharp",
+      },
+      { label: "Üniversite", value: "university", icon: "library" },
+      { label: "Kütüphane", value: "library", icon: "book" },
+    ],
+  },
+
+  {
+    name: "Kamu & Resmi Kurumlar",
+    color: "#264653",
+    types: [
+      { label: "Polis Merkezi", value: "police", icon: "shield" },
+      { label: "İtfaiye", value: "fire_station", icon: "flame" },
+      { label: "Postane", value: "post_office", icon: "mail" },
+      { label: "Belediye Binası", value: "city_hall", icon: "business" },
+      { label: "Mahkeme", value: "courthouse", icon: "hammer" },
+      { label: "Büyükelçilik", value: "embassy", icon: "flag" },
+      {
+        label: "Yerel Yönetim",
+        value: "local_government_office",
+        icon: "people",
+      },
+    ],
+  },
+
+  {
+    name: "Finans & Hukuk",
+    color: "#14213D",
+    types: [
+      { label: "Banka", value: "bank", icon: "cash" },
+      { label: "ATM", value: "atm", icon: "card" },
+      {
+        label: "Sigorta Acentesi",
+        value: "insurance_agency",
+        icon: "document-text",
+      },
+      { label: "Avukat", value: "lawyer", icon: "document" },
     ],
   },
   {
     name: "Hizmetler",
     color: "#00BFFF",
     types: [
-      { label: "Banka", value: "bank", icon: "cash" },
-      { label: "ATM", value: "atm", icon: "card" },
-      { label: "Hastane", value: "hospital", icon: "medkit" },
-      { label: "Eczane", value: "pharmacy", icon: "medkit-outline" },
-      { label: "Polis", value: "police", icon: "shield" },
-      { label: "Postane", value: "post_office", icon: "mail" },
-    ],
-  },
-  {
-    name: "Diğer",
-    color: "#4B0082",
-    types: [
-      { label: "Hindu Tapınağı", value: "hindu_temple", icon: "home" },
-      { label: "Sinagog", value: "synagogue", icon: "star-of-david" },
-      { label: "Tren İstasyonu", value: "train_station", icon: "train" },
+      { label: "Çamaşırhane", value: "laundry", icon: "water" },
+      { label: "Çilingir", value: "locksmith", icon: "key" },
+      { label: "Tesisatçı", value: "plumber", icon: "construct" },
+      { label: "Elektrikçi", value: "electrician", icon: "flash" },
+      { label: "Boya & Dekorasyon", value: "painter", icon: "color-fill" },
+      { label: "Kuaför", value: "hair_care", icon: "cut" },
+      { label: "Güzellik Salonu", value: "beauty_salon", icon: "sparkles" },
+      { label: "SPA", value: "spa", icon: "flower" },
+      { label: "Araba Yıkama", value: "car_wash", icon: "car" },
+      { label: "Araba Tamiri", value: "car_repair", icon: "construct" },
+      { label: "Nakliye Şirketi", value: "moving_company", icon: "cube" },
+      { label: "Cenaze Hizmetleri", value: "funeral_home", icon: "skull" },
     ],
   },
 ];
 
-interface SearchFilterProps {
-  onCategorySelect: (selectedType: string) => void;
-}
-
-const SearchFilterSection: React.FC<SearchFilterProps> = ({
-  onCategorySelect,
-}) => {
-  const [selectedCategory, setSelectedCategory] = useState(categories[0]); // Varsayılan kategori
-  const [modalVisible, setModalVisible] = useState(false); // Modal kontrolü
+const SearchFilterSection = ({ onCategorySelect }: any) => {
+  const [selectedCategory, setSelectedCategory] = useState(categories[0]);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const handleSelectCategory = (category: any) => {
     setSelectedCategory(category);
     setModalVisible(true);
   };
 
-  const handleSelectType = (type: string) => {
-    onCategorySelect(type); // Backend'e İngilizce değeri gönder
+  const handleSelectType = (type: any) => {
+    onCategorySelect(type);
     setModalVisible(false);
   };
 
   return (
     <View style={styles.container}>
-      {/* 📌 Yatay Scroll Kategoriler */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -98,7 +182,13 @@ const SearchFilterSection: React.FC<SearchFilterProps> = ({
         {categories.map((category) => (
           <TouchableOpacity
             key={category.name}
-            style={[styles.categoryButton, { backgroundColor: category.color }]}
+            style={[
+              styles.categoryButton,
+              {
+                backgroundColor: category.color,
+                borderWidth: selectedCategory.name === category.name ? 2 : 0,
+              },
+            ]}
             onPress={() => handleSelectCategory(category)}
           >
             <Text style={styles.categoryText}>{category.name}</Text>
@@ -106,13 +196,11 @@ const SearchFilterSection: React.FC<SearchFilterProps> = ({
         ))}
       </ScrollView>
 
-      {/* 📌 MODAL - Kullanıcı Dostu Seçenekler */}
-      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+      <Modal animationType="fade" transparent={true} visible={modalVisible}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>{selectedCategory.name} Seç</Text>
 
-            {/* 📌 Seçenekler (Türkçe + İkonlu) */}
             {selectedCategory.types.map((type, index) => (
               <TouchableOpacity
                 key={`${type.value}-${index}`}
@@ -146,22 +234,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   categoryButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
     borderRadius: 20,
     marginHorizontal: 5,
+    borderColor: "#FFF",
   },
   categoryText: {
     color: "#fff",
-    fontSize: 12,
-    marginLeft: 5,
+    fontSize: 14,
   },
-  // 📌 Modal için stil ayarları
   modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Arkaplanı saydam yap
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
   },
   modalContent: {
     width: "80%",
