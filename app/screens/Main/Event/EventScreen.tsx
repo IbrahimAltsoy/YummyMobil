@@ -8,51 +8,53 @@ import {
   Animated,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons/";
+import { useTranslation } from "react-i18next";
 
 const screenWidth = Dimensions.get("window").width;
 const cardWidth = screenWidth / 2 - 20;
 const cardHeight = 100;
 
-const events: any = [
-  {
-    id: 1,
-    name: "Şehrinizdeki Konser ve Gösteriler",
-    icon: "musical-notes-outline",
-    color: "#FF5733",
-  },
-  {
-    id: 2,
-    name: "Nöbetçi Eczaneler",
-    icon: "medkit-outline",
-    color: "#4CAF50",
-  },
-  {
-    id: 3,
-    name: "Bugün ve Önümüzdeki Günlerin Tahmini",
-    icon: "cloudy-outline",
-    color: "#2196F3",
-  },
-  {
-    id: 4,
-    name: "Şehrinizde Yaklaşan Özel Günler",
-    icon: "calendar-outline",
-    color: "#9C27B0",
-  },
-  {
-    id: 5,
-    name: "Şehir Verileri ve Analizler",
-    icon: "stats-chart-outline",
-    color: "#FFC107",
-  },
-  {
-    id: 6,
-    name: "Afet ve Güvenlik Uyarıları",
-    icon: "alert-circle-outline",
-    color: "#F44336",
-  },
-];
-
 const EventScreen = () => {
+  const { t } = useTranslation(); // 📌 Çeviri fonksiyonunu çağırdık
+  const events: any = [
+    {
+      id: 1,
+      name: t("Şehrinizde Yaklaşan Etkinlikler"),
+      icon: "musical-notes-outline",
+      color: "#FF5733",
+    },
+    {
+      id: 2,
+      name: t("Nöbetçi Eczaneler"),
+      icon: "medkit-outline",
+      color: "#4CAF50",
+    },
+    {
+      id: 3,
+      name: t("Bugün ve Önümüzdeki Günlerin Tahmini"),
+      icon: "cloudy-outline",
+      color: "#2196F3",
+    },
+    {
+      id: 4,
+      name: t("Şehrinizde Yaklaşan Özel Günler"),
+      icon: "calendar-outline",
+      color: "#9C27B0",
+    },
+    {
+      id: 5,
+      name: t("Şehir Verileri ve Analizler"),
+      icon: "stats-chart-outline",
+      color: "#FFC107",
+    },
+    {
+      id: 6,
+      name: t("Afet ve Güvenlik Uyarıları"),
+      icon: "alert-circle-outline",
+      color: "#F44336",
+    },
+  ];
+
   return (
     <View style={{ flex: 1, padding: 20, backgroundColor: "#f4f4f4" }}>
       {/* 📌 Üst Kısma Başlık ve Açıklama */}
@@ -65,7 +67,7 @@ const EventScreen = () => {
           color: "#333",
         }}
       >
-        📍 Şehrinizde Neler Oluyor?
+        📍 {t("Şehrinizde Neler Oluyor?")}
       </Text>
       <Text
         style={{
@@ -76,7 +78,8 @@ const EventScreen = () => {
           marginBottom: 20,
         }}
       >
-        🌟 Hava durumu, nöbetçi eczaneler ve önemli etkinlikleri kaçırmayın!
+        🌟{" "}
+        {t("Hava durumu, nöbetçi eczaneler ve önemli etkinlikleri kaçırmayın!")}
       </Text>
 
       {/* 📌 2 Sütunlu Kartlar */}
@@ -119,7 +122,7 @@ const EventScreen = () => {
                 flex: 1,
               }}
             >
-              {item.name}
+              {t(item.name)}
             </Text>
           </TouchableOpacity>
         )}
@@ -135,7 +138,7 @@ const EventScreen = () => {
             textAlign: "center",
           }}
         >
-          📌 Etkinlik detaylarını görmek için bir kategoriye dokunun.
+          📌 {t("Etkinlik detaylarını görmek için bir kategoriye dokunun.")}
         </Text>
         <Text
           style={{
@@ -146,7 +149,7 @@ const EventScreen = () => {
             marginTop: 5,
           }}
         >
-          🔄 Şehir etkinliklerini güncellemek için yukarı kaydırın!
+          🔄 {t("Şehir etkinliklerini güncellemek için yukarı kaydırın!")}
         </Text>
       </View>
     </View>

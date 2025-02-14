@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { useTranslation } from "react-i18next";
 
 interface YCardProps {
   name: string;
@@ -23,6 +24,8 @@ const YCard: React.FC<YCardProps> = ({
   distance,
   onPlacePress,
 }) => {
+  const { t } = useTranslation(); // 📌 Çeviri fonksiyonunu çağırdık
+
   return (
     <View style={styles.card}>
       {/* 📌 Görsel Sola Alındı */}
@@ -40,7 +43,9 @@ const YCard: React.FC<YCardProps> = ({
             <Text style={styles.rating}>
               {rating > 0 ? `${rating.toFixed(1)} / 5` : "Not Rated"}
             </Text>
-            <Text style={styles.ratingCount}>({user_Ratings_Total} oy)</Text>
+            <Text style={styles.ratingCount}>
+              ({user_Ratings_Total} {t("oy")})
+            </Text>
           </View>
 
           {/* 📌 Mesafe */}
@@ -55,7 +60,7 @@ const YCard: React.FC<YCardProps> = ({
           style={styles.detailButton}
           onPress={() => onPlacePress(place_id)}
         >
-          <Text style={styles.detailButtonText}>Detayları Gör</Text>
+          <Text style={styles.detailButtonText}>{t("Detayları Gör")}</Text>
         </TouchableOpacity>
       </View>
     </View>

@@ -8,6 +8,7 @@ import {
   Modal,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons"; // İkonlar için
+import { useTranslation } from "react-i18next";
 
 // 📌 ENUMLARA GÖRE KATEGORİLERİN TANIMLANMASI
 const categories = [
@@ -161,6 +162,7 @@ const categories = [
 const SearchFilterSection = ({ onCategorySelect }: any) => {
   const [selectedCategory, setSelectedCategory] = useState(categories[0]);
   const [modalVisible, setModalVisible] = useState(false);
+  const { t } = useTranslation(); // 📌 Çeviri fonksiyonunu çağırdık
 
   const handleSelectCategory = (category: any) => {
     setSelectedCategory(category);
@@ -191,7 +193,7 @@ const SearchFilterSection = ({ onCategorySelect }: any) => {
             ]}
             onPress={() => handleSelectCategory(category)}
           >
-            <Text style={styles.categoryText}>{category.name}</Text>
+            <Text style={styles.categoryText}>{t(category.name)}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -199,7 +201,9 @@ const SearchFilterSection = ({ onCategorySelect }: any) => {
       <Modal animationType="fade" transparent={true} visible={modalVisible}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{selectedCategory.name} Seç</Text>
+            <Text style={styles.modalTitle}>
+              {t(selectedCategory.name)} {t("Seç")}
+            </Text>
 
             {selectedCategory.types.map((type, index) => (
               <TouchableOpacity
@@ -208,7 +212,7 @@ const SearchFilterSection = ({ onCategorySelect }: any) => {
                 onPress={() => handleSelectType(type.value)}
               >
                 <Icon name={type.icon} size={24} color="#333" />
-                <Text style={styles.modalOptionText}>{type.label}</Text>
+                <Text style={styles.modalOptionText}>{t(type.label)}</Text>
               </TouchableOpacity>
             ))}
 
@@ -216,7 +220,7 @@ const SearchFilterSection = ({ onCategorySelect }: any) => {
               onPress={() => setModalVisible(false)}
               style={styles.modalCloseButton}
             >
-              <Text style={styles.modalCloseText}>İptal</Text>
+              <Text style={styles.modalCloseText}>{t("İptal")}</Text>
             </TouchableOpacity>
           </View>
         </View>

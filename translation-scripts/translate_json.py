@@ -33,16 +33,28 @@ pattern = re.compile(r't\("([^"]+)"\)')
 found_keys = set(tr_data.keys())
 new_keys = set()
 
-for root, dirs, files in os.walk(project_path):
-    for file in files:
-        if file.endswith(".js") or file.endswith(".jsx") or file.endswith(".tsx"):
-            with open(os.path.join(root, file), "r", encoding="utf-8") as f:
-                content = f.read()
-                matches = pattern.findall(content)
-                for key in matches:
-                    if key not in found_keys:
-                        tr_data[key] = key.replace("_", " ").capitalize()
-                        new_keys.add(key)
+# 📌 **Tüm JavaScript/TypeScript dosyalarını tara ve stringleri bul**
+def extract_strings_from_code():
+    extracted_strings = set()
+    for root, dirs, files in os.walk(project_path):
+        for file in files:
+            if file.endswith(".js") or file.endswith(".jsx") or file.endswith(".tsx"):
+                with open(os.path.join(root, file), "r", encoding="utf-8") as f:
+                    content = f.read()
+                    # `t("...")` içindeki metinleri yakala
+                    matches = pattern.findall(content)
+                    extracted_strings.update(matches)
+                    # Tüm string sabitlerini yakalamak için basit regex
+                    other_strings = re.findall(r'"(.*?)"', content)
+                    extracted_strings.update(other_strings)
+    return extracted_strings
+
+extracted_strings = extract_strings_from_code()
+
+for key in extracted_strings:
+    if key not in found_keys:
+        tr_data[key] = key.replace("_", " ").capitalize()
+        new_keys.add(key)
 
 # 📌 **Güncellenmiş `tr.json` dosyasını kaydet**
 with open(tr_json_path, "w", encoding="utf-8") as f:

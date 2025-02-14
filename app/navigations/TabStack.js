@@ -19,7 +19,7 @@ const TabStack = () => (
           iconName = focused ? "home" : "home-outline";
         } else if (route.name === "Event") {
           iconName = focused ? "calendar" : "calendar-outline";
-        } else if (route.name === "profile") {
+        } else if (route.name === "Profile") {
           iconName = focused ? "settings" : "settings-outline";
         }
 
@@ -69,7 +69,7 @@ const TabStack = () => (
       options={{ headerShown: false }}
     />
     <Tab.Screen
-      name="profile"
+      name="Profile"
       component={ProfileScreen}
       options={{ headerShown: false }}
     />

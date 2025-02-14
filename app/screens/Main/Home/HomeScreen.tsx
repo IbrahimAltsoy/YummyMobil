@@ -18,6 +18,7 @@ import * as Location from "expo-location";
 import Slider from "@react-native-community/slider";
 import LottieView from "lottie-react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { useTranslation } from "react-i18next";
 
 const HomeScreen: React.FC = () => {
   const navigation: any | undefined = useNavigation();
@@ -28,6 +29,7 @@ const HomeScreen: React.FC = () => {
   const [radius, setRadius] = useState(1000); // API'ye gidecek gerçek değer
   const [tempRadius, setTempRadius] = useState(1000); // Kullanıcının değiştirdiği geçici değer
   const [modalVisible, setModalVisible] = useState(false);
+  const { t } = useTranslation(); // 📌 Çeviri fonksiyonunu çağırdık
 
   // 📌 Kategori değiştiğinde çağrılacak fonksiyon
   const handleCategoryChange = async (types: any) => {
@@ -128,7 +130,7 @@ const HomeScreen: React.FC = () => {
               }}
             >
               <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-                📍 Yakınlık Ayarı
+                📍 {t("Yakınlık Ayarı")}
               </Text>
             </View>
 
@@ -138,16 +140,10 @@ const HomeScreen: React.FC = () => {
               minimumValue={500}
               maximumValue={5000}
               step={100}
-              value={tempRadius} // Geçici state ile değiştiriyoruz
-              onValueChange={(value) => setTempRadius(value)} // Kullanıcı kaydırdıkça güncelleniyor ama istek atmıyor
+              value={tempRadius}
+              onValueChange={(value) => setTempRadius(value)}
             />
 
-            {/* Seçilen Çap */}
-            {/* <Text
-              style={{ textAlign: "center", fontSize: 16, marginBottom: 15 }}
-            >
-              Seçilen Çap: {tempRadius} metre
-            </Text> */}
             <View
               style={{
                 flexDirection: "row",
@@ -162,7 +158,7 @@ const HomeScreen: React.FC = () => {
                 🔎
               </Text>
               <Text style={{ fontSize: 16, fontWeight: "bold", color: "#444" }}>
-                Yakınlık Mesafesi {tempRadius} metre
+                {t("Yakınlık Mesafesi")} {tempRadius} {t("Metre")}
               </Text>
             </View>
 
@@ -184,7 +180,7 @@ const HomeScreen: React.FC = () => {
                 <Text
                   style={{ color: "white", fontSize: 16, textAlign: "center" }}
                 >
-                  İptal
+                  {t("İptal")}
                 </Text>
               </TouchableOpacity>
 
@@ -206,7 +202,7 @@ const HomeScreen: React.FC = () => {
                 <Text
                   style={{ color: "white", fontSize: 16, textAlign: "center" }}
                 >
-                  Uygula
+                  {t("Uygula")}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -225,7 +221,7 @@ const HomeScreen: React.FC = () => {
           {/* 📌 Yakındaki işletmeleri keşfet metnini ortaladık */}
           <View style={styles.textContainer}>
             <Text style={styles.description}>
-              👋 Yakındaki işletmeleri keşfet!
+              👋 {t("Yakındaki işletmeleri keşfet")}!
             </Text>
           </View>
         </View>
@@ -249,7 +245,7 @@ const HomeScreen: React.FC = () => {
               marginTop: 10,
             }}
           >
-            Mekanları senin için keşfediyoruz...
+            {t("Mekanları senin için keşfediyoruz...")}
           </Text>
         </View>
       ) : (

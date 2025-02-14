@@ -48,9 +48,6 @@ const ProfileScreen = () => {
     await i18n.changeLanguage(newLanguage);
     await AsyncStorage.setItem("user-language", newLanguage);
     setUser((prev) => ({ ...prev, language: newLanguage }));
-    console.log("Current Language:", i18n.language);
-    console.log("Dil değiştirildi:", user.language);
-    console.log("Çeviri Kaynakları:", JSON.stringify(i18n.options.resources));
   };
 
   const handleImagePick = async () => {

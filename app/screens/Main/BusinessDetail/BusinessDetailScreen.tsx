@@ -18,6 +18,7 @@ import { useRoute } from "@react-navigation/native";
 import { PlaceDetailResult } from "@/app/models/googlePlaces/PlaceDetailResult";
 import PlaceService from "../../../services/googlePlacesService";
 import * as Location from "expo-location";
+import { useTranslation } from "react-i18next";
 
 const renderReviewItem = ({ item }: any) => (
   <View style={styles.reviewItem}>
@@ -35,6 +36,8 @@ const PlaceDetailScreen = () => {
   );
   const [loading, setLoading] = useState<boolean>(true);
   const { place_id } = route.params as { place_id: string };
+  const { t } = useTranslation();
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -82,7 +85,7 @@ const PlaceDetailScreen = () => {
   );
 
   const handleClaimBusiness = () => {
-    console.log("İşletme Sahiplenildi: ", placeDetail?.result.name);
+    console.log("Claim Business");
   };
   const openInMaps = () => {
     const url = `https://www.google.com/maps/search/?api=1&query=${placeDetail?.result.geometry.location.lat},${placeDetail?.result.geometry.location.lng}`;
@@ -103,13 +106,13 @@ const PlaceDetailScreen = () => {
         vertical={false}
       />
 
-      <Text style={styles.title}>{placeDetail?.result.name} </Text>
+      <Text style={styles.title}>{placeDetail?.result.name}</Text>
 
       <View style={styles.detailContainer}>
         <Text style={styles.address}>
           {placeDetail?.result.vicinity
             ? placeDetail?.result.vicinity
-            : "Yokkk"}
+            : t("Yok")}
         </Text>
 
         <View style={styles.rowContainer}>
@@ -121,16 +124,16 @@ const PlaceDetailScreen = () => {
             }
           >
             {placeDetail?.result.opening_Hours?.open_Now
-              ? "🟢 (Açık)"
-              : "🔴 (Kapalı)"}
+              ? t("🟢 (Açık)")
+              : t("🔴 (Kapalı)")}
           </Text>
           {placeDetail?.result.rating ? (
             <Text style={styles.rating}>
               ⭐ {placeDetail?.result.rating} / 5 (
-              {placeDetail?.result.user_Ratings_Total} oy)
+              {placeDetail?.result.user_Ratings_Total} {t("oy")})
             </Text>
           ) : (
-            <Text style={styles.rating}>⭐ Puanlama Yok</Text>
+            <Text style={styles.rating}>⭐ {t("Puanlama Yok")}</Text>
           )}
         </View>
       </View>
@@ -148,7 +151,7 @@ const PlaceDetailScreen = () => {
           disabled={!placeDetail?.result?.formatted_Phone_Number} // Eğer numara yoksa buton devre dışı kalır
         >
           <Text style={styles.phoneButtonText}>
-            📞 {placeDetail?.result?.formatted_Phone_Number || "Yok"}
+            📞 {placeDetail?.result?.formatted_Phone_Number || t("Yok")}
           </Text>
         </TouchableOpacity>
 
@@ -163,7 +166,9 @@ const PlaceDetailScreen = () => {
         >
           <Text style={styles.websiteButtonText}>
             🌍{" "}
-            {placeDetail?.result?.website ? "Siteyi Gör" : "Site Bilgisi Yok"}
+            {placeDetail?.result?.website
+              ? t("Siteyi Gör")
+              : t("Site Bilgisi Yok")}
           </Text>
         </TouchableOpacity>
       </View>
@@ -174,7 +179,7 @@ const PlaceDetailScreen = () => {
             Linking.openURL(
               placeDetail?.result?.social_Media?.instagram
                 ? ""
-                : "Instagram bilgisi bulunmamaktadır."
+                : t("Instagram bilgisi bulunmamaktadır.")
             )
           }
         >
@@ -185,7 +190,7 @@ const PlaceDetailScreen = () => {
             Linking.openURL(
               placeDetail?.result.social_Media?.facebook
                 ? ""
-                : "Facebook bilgisi bulunmamaktadır."
+                : t("Facebook bilgisi bulunmamaktadır.")
             )
           }
         >
@@ -196,7 +201,7 @@ const PlaceDetailScreen = () => {
             Linking.openURL(
               placeDetail?.result.social_Media?.twitter
                 ? ""
-                : "Twitter bilgisi bulunmamaktadır."
+                : t("Twitter bilgisi bulunmamaktadır.")
             )
           }
         >
@@ -224,16 +229,17 @@ const PlaceDetailScreen = () => {
 
       <TouchableOpacity onPress={openInMaps} style={styles.button}>
         <Text style={styles.buttonText}>
-          📍 İşletmeye Git ({placeDetail?.result.distance.toFixed(2)} km)
+          📍 {t("İşletmeye Git")} ({placeDetail?.result.distance.toFixed(2)}{" "}
+          {t("km")})
         </Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={[styles.button, styles.claimButton]}>
-        <Text style={styles.buttonText}>İşletmeyi Sahiplen</Text>
+        <Text style={styles.buttonText}>🎉 {t("İşletmeyi Sahiplen")}</Text>
       </TouchableOpacity>
       <View>
         <Text style={styles.title}>
-          Yorumlar({placeDetail?.result.reviews?.length})
+          {t("Yorumlar")} ({placeDetail?.result.reviews?.length})
         </Text>
         <FlatList
           data={placeDetail?.result.reviews || []}
