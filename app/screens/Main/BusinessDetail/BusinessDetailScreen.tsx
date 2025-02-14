@@ -19,14 +19,20 @@ import { PlaceDetailResult } from "@/app/models/googlePlaces/PlaceDetailResult";
 import PlaceService from "../../../services/googlePlacesService";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
-
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import "dayjs/locale/en";
+dayjs.extend(relativeTime);
+dayjs.locale("en");
 const renderReviewItem = ({ item }: any) => (
   <View style={styles.reviewItem}>
     <Text style={styles.reviewAuthor}>
       {item.author_Name} - ⭐{item.rating}
     </Text>
     <Text>{item.text}</Text>
-    <Text style={styles.reviewTime}>{item.relative_Time_Description}</Text>
+    <Text style={styles.reviewTime}>
+      {dayjs(item.time * 1000).fromNow()} {/* ✅ Zamanı çevirdik */}
+    </Text>
   </View>
 );
 const PlaceDetailScreen = () => {
