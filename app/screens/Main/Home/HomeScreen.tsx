@@ -19,6 +19,7 @@ import Slider from "@react-native-community/slider";
 import LottieView from "lottie-react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
+import { GetNearbyPlacesQueryRequest } from "@/app/models/googlePlaces/GetNearbyPlacesQueryRequest";
 
 const HomeScreen: React.FC = () => {
   const navigation: any | undefined = useNavigation();
@@ -65,12 +66,14 @@ const HomeScreen: React.FC = () => {
       });
 
       const selectedCategory = categoryTypes.join(",");
-      const data = await GooglePlacesService.getNearbyPlaces(
-        selectedCategory,
-        location.coords.latitude,
-        location.coords.longitude,
-        radius // 📌 Kullanıcının seçtiği radius değeri burada kullanılıyor
-      );
+      const request: GetNearbyPlacesQueryRequest = {
+        category: selectedCategory,
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        radius: radius,
+      };
+
+      const data = await GooglePlacesService.getNearbyPlaces(request);
 
       setPlacesData(data);
     } catch (err: any) {

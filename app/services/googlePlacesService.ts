@@ -2,19 +2,17 @@ import axios from "axios";
 import API_URL from "../utils/baseUrl";
 import { GoogleNearPlaces } from "../models/googlePlaces/googleNearPlaces";
 import { PlaceDetailResult } from "../models/googlePlaces/PlaceDetailResult";
-
+import { GetNearbyPlacesQueryRequest } from "../models/googlePlaces/GetNearbyPlacesQueryRequest";
+import { GetNearByPlaceDetailQueryRequest } from "../models/googlePlaces/GetNearByPlaceDetailQueryRequest";
 const GooglePlacesService = {
   async getNearbyPlaces(
-    category: string,
-    latitude: number,
-    longitude: number,
-    radius: number
+    request: GetNearbyPlacesQueryRequest
   ): Promise<GoogleNearPlaces[]> {
     try {
       const response = await axios.get(
-        `${API_URL.API_BASE_URL}/test/get-nearby-places`,
+        `${API_URL.API_BASE_URL}/api/get-nearby-places`,
         {
-          params: { category, latitude, longitude, radius },
+          params: request,
         }
       );
 
@@ -35,27 +33,15 @@ const GooglePlacesService = {
       throw new Error("Yakındaki mekanları alırken bir hata oluştu.");
     }
   },
-  // async getPlaceDetails(place_Id: string): Promise<PlaceDetailResult | null> {
-  //   try {
-  //     const response = await axios.get<PlaceDetailResult>(
-  //       `${API_URL.API_BASE_URL}/test/get-business-detail/${place_Id}`
-  //     );
-  //     return response.data;
-  //   } catch (error) {
-  //     console.error("İşletme detayları alınırken hata oluştu:", error);
-  //     return null;
-  //   }
-  // },
+
   async getPlaceDetails(
-    place_Id: string,
-    latitude: number,
-    longitude: number
+    requst: GetNearByPlaceDetailQueryRequest
   ): Promise<PlaceDetailResult | null> {
     try {
       const response = await axios.get(
-        `${API_URL.API_BASE_URL}/test/get-business-detail/${place_Id}`,
+        `${API_URL.API_BASE_URL}/api/get-business-detail/${requst.placeId}`,
         {
-          params: { latitude, longitude }, // Konum parametrelerini API'ye gönderiyoruz
+          params: { latitude: requst.latitude, longitude: requst.longitude }, // Konum parametrelerini API'ye gönderiyoruz
         }
       );
       return response.data;

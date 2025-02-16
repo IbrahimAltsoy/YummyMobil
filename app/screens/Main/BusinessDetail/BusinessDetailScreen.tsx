@@ -22,6 +22,7 @@ import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/en";
+import { GetNearByPlaceDetailQueryRequest } from "@/app/models/googlePlaces/GetNearByPlaceDetailQueryRequest";
 dayjs.extend(relativeTime);
 dayjs.locale("en");
 const renderReviewItem = ({ item }: any) => (
@@ -71,11 +72,12 @@ const PlaceDetailScreen = () => {
       ]);
 
       //
-      const data = await PlaceService.getPlaceDetails(
-        place_id,
-        location.coords.latitude,
-        location.coords.longitude
-      );
+      const request: GetNearByPlaceDetailQueryRequest = {
+        placeId: place_id,
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+      const data = await PlaceService.getPlaceDetails(request);
       setPlaceDetail(data);
       setLoading(false);
     };
