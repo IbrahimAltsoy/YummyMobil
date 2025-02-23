@@ -14,10 +14,12 @@ import userService from "../../../services/userService";
 import { GetUserByIdResponse } from "../../../models/user/GetUserByIdQueryResponse";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import i18n from "../../../i18n";
-import { useNavigation } from "@react-navigation/native"; // 📌 Navigation için ekledik
+import { useNavigation } from "@react-navigation/native";
 import authService from "@/app/services/authService";
 import * as SecureStore from "expo-secure-store";
 import AuthContext from "@/app/context/AuthContext";
+import FeedbackForm from "@/app/components/Footer/Feedbackform";
+import Icon from "react-native-vector-icons/Ionicons";
 
 const ProfileScreen = () => {
   const { t } = useTranslation();
@@ -27,17 +29,19 @@ const ProfileScreen = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("tr");
   const [modalVisible, setModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const authContext = useContext(AuthContext); // 📌 Önce değişkene atayalım
+  const [isFeedbackVisible, setIsFeedbackVisible] = useState(false);
 
+  // AuthContext kullanımı
+  const authContext = useContext(AuthContext);
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
+  const { logout } = authContext;
 
-  const { logout } = authContext; // 📌 logout fonksiyonunu güvenli şekilde al
+  // Kullanıcı verisi ve dil ayarını çekme
   useEffect(() => {
     const fetchUserAndLanguage = async () => {
       setLoading(true);
-
       try {
         const userData = await userService.getUserById();
         if (userData) {
@@ -54,14 +58,17 @@ const ProfileScreen = () => {
       } catch (error) {
         Alert.alert(t("Hata"), t("Veri yüklenirken bir hata oluştu."));
       }
-
       setLoading(false);
     };
 
     fetchUserAndLanguage();
   }, []);
 
-  const changeLanguage = async (lang: any) => {
+  // Modal aç/kapa fonksiyonları
+  const openFeedbackForm = () => setIsFeedbackVisible(true);
+  const closeFeedbackForm = () => setIsFeedbackVisible(false);
+
+  const changeLanguage = async (lang: string) => {
     setSelectedLanguage(lang);
     i18n.changeLanguage(lang);
     await AsyncStorage.setItem("appLanguage", lang);
@@ -72,7 +79,7 @@ const ProfileScreen = () => {
     try {
       //await userService.deleteUser();
       Alert.alert(t("Başarılı"), t("Hesabınız başarıyla silindi."));
-      //navigation.navigate("Login"); // 📌 Hesap silindikten sonra login ekranına yönlendir
+      //navigation.navigate("Login");
     } catch (error) {
       Alert.alert(t("Hata"), t("Hesap silinirken bir hata oluştu."));
     }
@@ -81,13 +88,13 @@ const ProfileScreen = () => {
   const handleLogout = async () => {
     try {
       await logout();
-
       Alert.alert(t("Başarılı"), t("Başarıyla çıkış yapıldı."));
     } catch (error) {
       Alert.alert(t("Hata"), t("Çıkış yapılırken bir hata oluştu."));
     }
   };
 
+  // Yüklenme ekranı
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
@@ -124,17 +131,40 @@ const ProfileScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.exitButton} onPress={handleLogout}>
-        <Text style={styles.buttonText}>{t("Çıkış Yap")}</Text>
-      </TouchableOpacity>
+      {/* Butonların yer aldığı kapsayıcı */}
+      <View style={styles.buttonContainer}>
+        <View style={styles.feedbackPromptContainer}>
+          <Icon name="chatbubbles-outline" size={24} color="#28a745" />
+          <Text style={styles.feedbackPromptText}>
+            {t("Fikriniz Bizim İçin Değerli")}
+          </Text>
+        </View>
+        <TouchableOpacity
+          style={styles.feedbackButton}
+          onPress={openFeedbackForm}
+        >
+          <Text style={styles.buttonText}>{t("Geri Bildirimde Bulun")}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.exitButton} onPress={handleLogout}>
+          <Text style={styles.buttonText}>{t("Çıkış Yap")}</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.deleteButton}
-        onPress={() => setDeleteModalVisible(true)}
-      >
-        <Text style={styles.buttonText}>{t("Hesabımı Sil")}</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={() => setDeleteModalVisible(true)}
+        >
+          <Text style={styles.buttonText}>{t("Hesabımı Sil")}</Text>
+        </TouchableOpacity>
+      </View>
 
+      {/* Geri Bildirim Modal */}
+      <Modal visible={isFeedbackVisible} animationType="slide" transparent>
+        <View style={styles.modalContainer}>
+          <FeedbackForm onClose={closeFeedbackForm} />
+        </View>
+      </Modal>
+
+      {/* Dil Seçim Modal */}
       <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -156,6 +186,7 @@ const ProfileScreen = () => {
         </View>
       </Modal>
 
+      {/* Hesap Silme Modal */}
       <Modal visible={deleteModalVisible} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -187,11 +218,31 @@ const ProfileScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  /* Ekran genel kapsayıcı */
   container: {
     flex: 1,
     alignItems: "center",
     padding: 20,
     backgroundColor: "#f8f9fa",
+  },
+  feedbackPromptContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#e6f9ee", // Hafif yeşil tonlu arka plan
+    padding: 10,
+    borderRadius: 10,
+    marginVertical: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  feedbackPromptText: {
+    fontSize: 16,
+    color: "#28a745", // Yeşil ton, ikonla uyumlu
+    fontWeight: "bold",
+    marginLeft: 8,
   },
   header: {
     fontSize: 22,
@@ -223,6 +274,8 @@ const styles = StyleSheet.create({
     color: "gray",
     marginBottom: 20,
   },
+
+  /* Dil seçimi butonu */
   languageWrapper: {
     marginTop: 10,
     alignItems: "center",
@@ -251,26 +304,56 @@ const styles = StyleSheet.create({
     color: "#333",
     marginLeft: 8,
   },
+
+  /* Butonlar için ayrı bir kapsayıcı */
+  buttonContainer: {
+    width: "100%",
+    alignItems: "center",
+    marginTop: 20, // Buton grubuna üstten boşluk
+  },
+
+  /* Çıkış Yap Butonu */
   exitButton: {
     backgroundColor: "#ff4d4d",
     paddingVertical: 15,
     borderRadius: 10,
     width: "70%",
     alignItems: "center",
-    marginBottom: 15,
+    marginBottom: 10, // Butonlar arasında boşluk
   },
+
+  /* Hesabı Sil Butonu */
   deleteButton: {
     backgroundColor: "#dc3545",
     paddingVertical: 15,
     borderRadius: 10,
     width: "70%",
     alignItems: "center",
+    marginBottom: 10, // Butonlar arasında boşluk
   },
+
+  /* Geri Bildirim Butonu */
+  feedbackButton: {
+    backgroundColor: "#17a2b8", // Mavi ton (Bootstrap Primary)
+    paddingVertical: 15,
+    borderRadius: 10,
+    width: "70%",
+    alignItems: "center",
+    marginBottom: 10, // Son butonun altına da boşluk
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+
+  /* Buton metni */
   buttonText: {
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
   },
+
+  /* Modal kapsayıcı */
   modalContainer: {
     flex: 1,
     justifyContent: "center",
@@ -303,6 +386,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "#ddd",
   },
+
+  /* Onaylama / İptal Butonları */
   confirmButton: {
     backgroundColor: "#dc3545",
     padding: 15,
@@ -318,6 +403,8 @@ const styles = StyleSheet.create({
     width: "90%",
     alignItems: "center",
   },
+
+  /* Yüklenme ekranı */
   loaderContainer: {
     flex: 1,
     justifyContent: "center",

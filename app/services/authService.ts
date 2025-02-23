@@ -6,11 +6,12 @@ import { UserLoginCommandResponse } from "../models/auth/UserLoginCommandRespons
 import { RegisterCommandRequest } from "../models/register/RegisterCommandRequest";
 import { RegisterCommandResponse } from "../models/register/RegisterCommandResponse";
 import { Alert } from "react-native";
+import apiClient from "../utils/apiClient";
 
 const authService = {
   login: async (loginData: LoginRequest): Promise<UserLoginCommandResponse> => {
     try {
-      const response = await axios.post<UserLoginCommandResponse>(
+      const response = await apiClient.post<UserLoginCommandResponse>(
         `${API_URL.API_BASE_URL}/Auth/login`,
         loginData,
         {
@@ -38,7 +39,7 @@ const authService = {
     registerData: RegisterCommandRequest
   ): Promise<RegisterCommandResponse> => {
     try {
-      const response = await axios.post<RegisterCommandResponse>(
+      const response = await apiClient.post<RegisterCommandResponse>(
         `${API_URL.API_BASE_URL}/Auth/register`,
         registerData,
         {

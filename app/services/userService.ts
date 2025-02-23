@@ -3,6 +3,7 @@ import * as SecureStore from "expo-secure-store";
 import API_URL from "../utils/baseUrl";
 import { jwtDecode } from "jwt-decode";
 import { GetUserByIdResponse } from "../models/user/GetUserByIdQueryResponse";
+import apiClient from "../utils/apiClient";
 
 const UserService = {
   getUserIdFromToken: async (): Promise<string | null> => {
@@ -26,7 +27,7 @@ const UserService = {
       const id = await UserService.getUserIdFromToken();
       if (!id) return null;
       const token = await SecureStore.getItemAsync("accessToken");
-      const response = await axios.get<GetUserByIdResponse>(
+      const response = await apiClient.get<GetUserByIdResponse>(
         `${API_URL.API_BASE_URL}/user/id?Id=${id}`,
         {
           params: { Id: id },
