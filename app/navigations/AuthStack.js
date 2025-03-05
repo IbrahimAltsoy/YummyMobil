@@ -2,6 +2,7 @@ import React from "react";
 import Login from "../screens/Auth/Login/LoginScreen";
 import WelcomeScreen from "../screens/Welcome";
 import RegisterScreen from "../screens/Auth/Register";
+import ForgotPasswordScreen from "../screens/Auth/ForgotPassword/ForgotPassword";
 import { createStackNavigator } from "@react-navigation/stack";
 
 const Stack = createStackNavigator();
@@ -26,6 +27,11 @@ const AuthStack = () => {
       <Stack.Screen
         name="Register"
         component={RegisterScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ForgotPassword"
+        component={ForgotPasswordScreen}
         options={{ headerShown: false }}
       />
       {/* <Stack.Screen

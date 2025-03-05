@@ -5,8 +5,11 @@ import { LoginRequest } from "../models/auth/LoginRequest";
 import { UserLoginCommandResponse } from "../models/auth/UserLoginCommandResponse";
 import { RegisterCommandRequest } from "../models/register/RegisterCommandRequest";
 import { RegisterCommandResponse } from "../models/register/RegisterCommandResponse";
+import { PasswordResetCommandRequest } from "../models/auth/PasswordResetCommandRequest";
+import { PasswordResetCommandResponse } from "../models/auth/PasswordResetCommandResponse";
 import { Alert } from "react-native";
 import apiClient from "../utils/apiClient";
+import { GoogleLoginCommandRequest } from "../models/auth/GoogleLoginCommandRequest";
 
 const authService = {
   login: async (loginData: LoginRequest): Promise<UserLoginCommandResponse> => {
@@ -71,6 +74,23 @@ const authService = {
       return { success: false, message: error.message };
     }
   },
+  forgotPassword: async (
+    email: PasswordResetCommandRequest
+  ): Promise<PasswordResetCommandResponse> => {
+    try {
+      const response = await apiClient.post<PasswordResetCommandResponse>(
+        `${API_URL.API_BASE_URL}/Auth/password-reset`,
+        email,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      Alert.alert("Şifre Sıfırlama", error.message);
+      throw new Error(error.message);
+    }
+  },
 
   // Oturum Durumu Kontrolü
   isLoggedIn: async () => {
@@ -91,6 +111,24 @@ const authService = {
     } catch (error: any) {
       console.error("Get User Error:", error.message);
       return null;
+    }
+  },
+  googleLogin: async (googleLoginRequest: GoogleLoginCommandRequest) => {
+    try {
+      const response = await apiClient.post(
+        `${API_URL.API_BASE_URL}/Auth/google-login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(googleLoginRequest),
+        }
+      );
+      if (!response.data) {
+        throw new Error("Login hatası");
+      }
+      return await response.data;
+    } catch (error) {
+      throw error;
     }
   },
 };
