@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import styles from "./Welcome.Style";
-
+import { useTranslation } from "react-i18next";
 // Logou yukarı doğru uzanan yıldızlar ekle önce 3 ane sonra 2 tane sonra bir tane
 interface Props {
   navigation: {
@@ -10,7 +10,7 @@ interface Props {
   };
 }
 const WelcomeScreen = ({ navigation }: Props) => {
-  // const navigation = useNavigation();
+  const { t } = useTranslation();
 
   const handleStart = () => {
     navigation.navigate("Login"); // Login ekranına yönlendirme
@@ -24,16 +24,18 @@ const WelcomeScreen = ({ navigation }: Props) => {
         resizeMode="contain"
       />
 
-      <Text style={styles.title}>Hello Yummy!</Text>
+      <Text style={styles.title}>{t("Merhaba")} Yummy</Text>
       <Text style={styles.motto}>
-        "The Power of the Service Grows with the User's Comment!"
+        {t("Hizmetin Gücü Kullanıcının Yorumuyla Artıyor!")}
       </Text>
       <Text style={styles.description}>
-        Join us now and experience the best service ever!
+        {t(
+          " Hemen aramıza katılın ve bugüne kadarki en iyi hizmeti deneyimleyin!"
+        )}
       </Text>
 
       <TouchableOpacity style={styles.button} onPress={handleStart}>
-        <Text style={styles.buttonText}>Start</Text>
+        <Text style={styles.buttonText}>{t("Başla")}</Text>
       </TouchableOpacity>
     </View>
   );

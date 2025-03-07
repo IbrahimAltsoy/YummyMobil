@@ -10,7 +10,7 @@ import { PasswordResetCommandResponse } from "../models/auth/PasswordResetComman
 import { Alert } from "react-native";
 import apiClient from "../utils/apiClient";
 import { GoogleLoginCommandRequest } from "../models/auth/GoogleLoginCommandRequest";
-
+import i18next from "i18next";
 const authService = {
   login: async (loginData: LoginRequest): Promise<UserLoginCommandResponse> => {
     try {
@@ -21,19 +21,16 @@ const authService = {
           headers: { "Content-Type": "application/json" },
         }
       );
-
-      // Access Token kontrolü ve SecureStore'a kaydetme
       if (response.data && response.data.accessToken.accessToken) {
         await SecureStore.setItemAsync(
           "accessToken",
           response.data.accessToken.accessToken
         );
-        // await SecureStore.deleteItemAsync("accessToken");
       }
 
       return response.data;
     } catch (error: any) {
-      console.error("Login Error:", error.message);
+      Alert.alert(i18next.t("Giriş hatası"), error.message);
       throw new Error(error.message);
     }
   },
@@ -58,7 +55,7 @@ const authService = {
 
       return response.data;
     } catch (error: any) {
-      console.error("Registration Error:", error.message);
+      Alert.alert("Error", error.message);
       throw new Error(error.message);
     }
   },
@@ -67,10 +64,9 @@ const authService = {
     try {
       // Sadece SecureStore'dan token'ı sil
       await SecureStore.deleteItemAsync("accessToken");
-      Alert.alert("Başarılı", "Çıkış yapıldı.");
       return { success: true };
     } catch (error: any) {
-      console.error("Logout Error:", error.message);
+      Alert.alert(i18next.t("Çıkış Hatası"), error.message);
       return { success: false, message: error.message };
     }
   },
@@ -92,13 +88,12 @@ const authService = {
     }
   },
 
-  // Oturum Durumu Kontrolü
   isLoggedIn: async () => {
     try {
       const token = await SecureStore.getItemAsync("accessToken");
       return !!token; // Token varsa true, yoksa false
     } catch (error: any) {
-      console.error("Token Check Error:", error.message);
+      Alert.alert(i18next.t("Token Kontrol Hatası"), error.message);
       return false;
     }
   },
@@ -109,7 +104,7 @@ const authService = {
       const token = await SecureStore.getItemAsync("accessToken");
       return token ? token : null;
     } catch (error: any) {
-      console.error("Get User Error:", error.message);
+      Alert.alert(i18next.t("Kullanıcı Yükleme Hatası"), error.message);
       return null;
     }
   },

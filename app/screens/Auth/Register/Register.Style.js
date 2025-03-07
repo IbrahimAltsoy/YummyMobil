@@ -71,5 +71,12 @@ const styles = StyleSheet.create({
     alignItems: "center", // Dikeyde ortalar
     marginTop: 20,
   },
+  errorText: {
+    color: "red",
+    marginTop: 12,
+  },
+  errorInput: {
+    borderColor: "red",
+  },
 });
 export default styles;

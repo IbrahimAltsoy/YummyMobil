@@ -1,4 +1,4 @@
-const API_BASE_URL: string = "http://192.168.1.105:7009/api";
+const API_BASE_URL: string = "http://172.20.10.2:7009/api";
 
 export default {
   API_BASE_URL,

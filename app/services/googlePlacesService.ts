@@ -10,7 +10,7 @@ const GooglePlacesService = {
     request: GetNearbyPlacesQueryRequest
   ): Promise<GoogleNearPlaces[]> {
     try {
-      const response = await axios.get(
+      const response = await apiClient.get(
         `${API_URL.API_BASE_URL}/api/get-nearby-places`,
         {
           params: request,

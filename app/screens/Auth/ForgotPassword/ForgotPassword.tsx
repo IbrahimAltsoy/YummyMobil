@@ -4,24 +4,27 @@ import { Ionicons } from "@expo/vector-icons";
 import YButton from "../../../components/YButton/YButton"; // YButton bileşeninizin olduğu yeri doğru şekilde import edin
 import authService from "@/app/services/authService";
 import { PasswordResetCommandRequest } from "../../../models/auth/PasswordResetCommandRequest";
+import { useTranslation } from "react-i18next";
+
 interface Props {
   navigation: {
     navigate: (screen: string) => void;
   };
 }
 const ForgotPasswordScreen = ({ navigation }: Props) => {
-  const [email, setEmail] = useState<string>(""); // email state'i tanımlandı
+  const { t } = useTranslation();
+  const [email, setEmail] = useState<string>("");
 
   const handleResetPassword = async () => {
     if (email) {
-      const request: PasswordResetCommandRequest = { email }; // Email'i bir obje olarak gönder
+      const request: PasswordResetCommandRequest = { email };
       try {
         const response = await authService.forgotPassword(request);
         Alert.alert(
           response.success ? "Başarılı" : "Başarısız",
           response.message
         );
-        navigation.navigate("Login"); // İşlem tamamlandıktan sonra login ekranına yönlendir
+        navigation.navigate("Login");
       } catch (error) {
         Alert.alert(
           "Hata",
@@ -35,9 +38,9 @@ const ForgotPasswordScreen = ({ navigation }: Props) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Şifremi Sıfırla</Text>
+      <Text style={styles.title}>{t("Şifremi Unuttum")}</Text>
       <Text style={styles.subtitle}>
-        Şifrenizi sıfırlamak için e-posta adresinizi girin.
+        {t("Luften e-posta adresinizi giriniz")}
       </Text>
 
       <View style={styles.inputContainer}>
@@ -51,15 +54,15 @@ const ForgotPasswordScreen = ({ navigation }: Props) => {
           style={styles.input}
           placeholder="Email"
           value={email}
-          onChangeText={(text) => setEmail(text)} // email state'ini güncelle
+          onChangeText={(text) => setEmail(text)}
           keyboardType="email-address"
           autoCapitalize="none"
         />
       </View>
 
       <YButton
-        title="Gönder"
-        onPress={handleResetPassword} // Fonksiyonu doğru şekilde atadık
+        title={t("Gönder")}
+        onPress={handleResetPassword}
         style={styles.resetButton}
       />
     </View>

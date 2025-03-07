@@ -7,7 +7,7 @@ import styles from "./LoginScreen.Style";
 import AuthContext from "../../../context/AuthContext";
 import { LoginRequest } from "../../../models/auth/LoginRequest";
 import * as WebBrowser from "expo-web-browser";
-
+import { useTranslation } from "react-i18next";
 WebBrowser.maybeCompleteAuthSession();
 interface GoogleIdTokenPayload {
   sub: string;
@@ -24,25 +24,21 @@ interface Props {
 }
 
 const Login = ({ navigation }: Props) => {
+  const { t } = useTranslation();
   const { login }: any = useContext(AuthContext);
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    // Giriş için gerekli veriyi oluşturuyoruz
     const loginData: LoginRequest = {
-      usernameOrEmail: usernameOrEmail, // email ya da kullanıcı adı
-      password: password, // şifre
+      usernameOrEmail: usernameOrEmail,
+      password: password,
     };
 
-    // login fonksiyonunu çağırıyoruz
     try {
       await login(loginData);
-      // navigation.navigate("Home"); // Giriş başarılıysa anasayfaya yönlendir
     } catch (error: any) {
-      // Giriş hatası durumunda kullanıcıya bildirim gösterebilirsiniz
       Alert.alert("Giriş hatası", error.message);
-      // console.error(error.message);
     }
   };
 
@@ -64,7 +60,7 @@ const Login = ({ navigation }: Props) => {
 
       {/* Şifre input */}
       <YInput
-        placeholder="Şifre"
+        placeholder={t("Sifre")}
         secureTextEntry
         value={password}
         onChangeText={setPassword}
@@ -73,14 +69,14 @@ const Login = ({ navigation }: Props) => {
 
       {/* Giriş butonu */}
       <YButton
-        title="Giriş Yap"
-        onPress={handleLogin} // Yeni handleLogin fonksiyonunu çağırıyoruz
+        title={t("Giriş Yap")}
+        onPress={handleLogin}
         style={styles.button}
       />
 
       {/* Diğer bağlantılar */}
       <View style={styles.linkContainer}>
-        <Text style={styles.text}>Hesabınız yok mu?</Text>
+        <Text style={styles.text}>{t("Hesabınız yok mu?")}</Text>
       </View>
 
       <View></View>
@@ -88,13 +84,13 @@ const Login = ({ navigation }: Props) => {
       {/* Sosyal medya ile giriş butonları */}
       <View style={styles.socialButtonContainer}>
         <YButton
-          title="Üye Ol"
+          title={t("Üye Ol")}
           icon={<Ionicons name="person-add-outline" size={20} color="white" />}
           onPress={() => navigation.navigate("Register")}
           style={styles.socialButton}
         />
         <YButton
-          title="Şifremi Unuttum"
+          title={t("Şifremi Unuttum")}
           icon={<Ionicons name="lock-closed-outline" size={20} color="white" />}
           onPress={() => navigation.navigate("ForgotPassword")}
           style={styles.socialButton}

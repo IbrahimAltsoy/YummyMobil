@@ -19,7 +19,7 @@ const categories = [
       { label: "Restoran", value: "restaurant", icon: "restaurant" },
       { label: "Kafe", value: "cafe", icon: "cafe" },
       { label: "Bar", value: "bar", icon: "beer" },
-      { label: "Fırın", value: "bakery", icon: "bread" },
+      { label: "Fırın", value: "bakery", icon: "storefront" },
       { label: "Yemek Dağıtımı", value: "meal_delivery", icon: "fast-food" },
       { label: "Paket Yemek", value: "meal_takeaway", icon: "cart" },
       { label: "Süpermarket", value: "supermarket", icon: "cart-outline" },
