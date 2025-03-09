@@ -4,6 +4,8 @@ import API_URL from "../utils/baseUrl";
 import { jwtDecode } from "jwt-decode";
 import { GetUserByIdResponse } from "../models/user/GetUserByIdQueryResponse";
 import apiClient from "../utils/apiClient";
+import { UpdateUserProfileImageCommandRequest } from "../models/user/UpdateUserProfileImageCommandRequest";
+import { UpdateUserProfileImageCommandResponse } from "../models/user/UpdateUserProfileImageCommandResponse";
 
 const UserService = {
   getUserIdFromToken: async (): Promise<string | null> => {
@@ -37,6 +39,44 @@ const UserService = {
     } catch (error: any) {
       console.error("Get User Error:", error.message);
       return null;
+    }
+  },
+  uploadProfileImage: async (
+    image: string // Dosya URI'si (örneğin, "file:///path/to/image.jpg")
+  ): Promise<UpdateUserProfileImageCommandResponse> => {
+    try {
+      // FormData oluştur
+      const formData = new FormData();
+
+      // Dosyayı URI'den al ve FormData'ya ekle
+      const file = {
+        uri: image,
+        name: "profile.jpg", // Dosya adı
+        type: "image/jpeg", // Dosya türü
+      };
+
+      // FormData'ya dosyayı ekle
+      formData.append("image", file as any); // ✅ Backend'in beklediği format
+
+      console.log("FormData İçeriği:", formData); // ✅ Gönderilecek içeriği kontrol edelim
+
+      // Backend'e yükleme işlemi
+      const apiResponse =
+        await apiClient.post<UpdateUserProfileImageCommandResponse>(
+          `${API_URL.API_BASE_URL}/user/updateImage`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+      console.log("API Yanıtı:", apiResponse.data);
+      return apiResponse.data;
+    } catch (error) {
+      console.error("Fotoğraf yüklenirken hata oluştu:", error);
+      throw error;
     }
   },
 };

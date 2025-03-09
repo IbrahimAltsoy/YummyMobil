@@ -12,8 +12,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    opacity: 0.7, // Opaklık vererek logoyu arka plan yapıyoruz
-    zIndex: -1, // Arka planda görünsün diye diğer öğelerin altına alıyoruz
+    opacity: 0.7,
+    zIndex: -1,
   },
   title: {
     fontSize: 24,
@@ -26,17 +26,17 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   input: {
-    width: "80%", // Ekranın %80'ini kaplama
+    width: "80%",
     marginBottom: 15,
     borderColor: "#FFD700",
-    borderRadius: 25, // Köşeleri yuvarlatma
+    borderRadius: 25,
     borderWidth: 1,
     padding: 10,
     fontSize: 16,
   },
   button: {
-    backgroundColor: "#FFD700", // Sarı renk
-    width: "80%", // Ekranın %80'ini kaplama
+    backgroundColor: "#FFD700",
+    width: "80%",
     borderRadius: 25,
     marginBottom: 20,
     paddingVertical: 15,
@@ -44,14 +44,14 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     color: "#333",
-    marginRight: 10, // Buton ile aralarına mesafe ekliyoruz
+    marginRight: 10,
     fontWeight: "500",
   },
   linkContainer: {
-    flexDirection: "row", // Yatay hizalama
-    justifyContent: "flex-start", // Sola yaslama
-    alignItems: "center", // Dikeyde ortalama
-    width: "80%", // Genişlik
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    width: "80%",
     marginTop: 20,
   },
   linkButton: {
@@ -59,16 +59,16 @@ const styles = StyleSheet.create({
     borderColor: "transparent",
     paddingVertical: 8,
     paddingHorizontal: 15,
-    marginLeft: 10, // Butonlar arasına mesafe eklemek için
-    borderRadius: 20, // Köşeleri yuvarlatıyoruz
+    marginLeft: 10,
+    borderRadius: 20,
     fontSize: 16,
-    color: "#FFD700", // Buton rengi sarı
+    color: "#FFD700",
     fontWeight: "bold",
   },
   buttonContainer: {
-    flexDirection: "row", // Butonları yatay hizalar
-    justifyContent: "space-between", // Birini sola, diğerini sağa yaslar
-    alignItems: "center", // Dikeyde ortalar
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginTop: 20,
   },
   errorText: {

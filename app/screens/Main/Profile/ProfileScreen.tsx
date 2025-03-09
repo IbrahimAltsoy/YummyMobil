@@ -15,11 +15,11 @@ import { GetUserByIdResponse } from "../../../models/user/GetUserByIdQueryRespon
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import i18n from "../../../i18n";
 import { useNavigation } from "@react-navigation/native";
-import authService from "@/app/services/authService";
-import * as SecureStore from "expo-secure-store";
 import AuthContext from "@/app/context/AuthContext";
 import FeedbackForm from "@/app/components/Footer/Feedbackform";
 import Icon from "react-native-vector-icons/Ionicons";
+import * as ImagePicker from "expo-image-picker";
+import { UpdateUserProfileImageCommandRequest } from "../../../models/user/UpdateUserProfileImageCommandRequest";
 
 const ProfileScreen = () => {
   const { t } = useTranslation();
@@ -37,6 +37,43 @@ const ProfileScreen = () => {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
   const { logout } = authContext;
+  const selectImage = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert(
+        t("İzin Gerekli"),
+        t("Fotoğraf eklemek için izni kabul etmelisiniz.")
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+    });
+
+    if (!result.canceled) {
+      try {
+        // Seçilen dosyayı al
+        const selectedImage = result.assets[0];
+
+        // Backend'e yükleme işlemi
+        const response = await userService.uploadProfileImage(
+          selectedImage.uri
+        );
+        Alert.alert(
+          t("Başarılı"),
+          t("Profil fotoğrafı başarıyla güncellendi.")
+        );
+      } catch (error) {
+        console.error("Fotoğraf yüklenirken hata oluştu:", error);
+        Alert.alert(t("Hata"), t("Fotoğraf yüklenirken bir hata oluştu."));
+      }
+    }
+  };
 
   // Kullanıcı verisi ve dil ayarını çekme
   useEffect(() => {
@@ -106,12 +143,12 @@ const ProfileScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>{t("Profil Bilgileri")}</Text>
-
-      <Image
-        source={{ uri: user?.imageUrl || "https://via.placeholder.com/150" }}
-        style={styles.profileImage}
-      />
-
+      <TouchableOpacity onPress={selectImage}>
+        <Image
+          source={{ uri: user?.imageUrl || "https://via.placeholder.com/150" }}
+          style={styles.profileImage}
+        />
+      </TouchableOpacity>
       <Text style={styles.userName}>
         {user?.name} {user?.surname}
       </Text>
@@ -225,6 +262,20 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#f8f9fa",
   },
+  uploadButton: {
+    backgroundColor: "#007bff",
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 10,
+    alignItems: "center",
+    width: "70%",
+  },
+  uploadButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+
   feedbackPromptContainer: {
     flexDirection: "row",
     alignItems: "center",

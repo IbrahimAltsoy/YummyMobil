@@ -30,8 +30,11 @@ const authService = {
 
       return response.data;
     } catch (error: any) {
-      Alert.alert(i18next.t("Giriş hatası"), error.message);
-      throw new Error(error.message);
+      return {
+        message: "Bir hata oluştu. Lütfen tekrar deneyin.",
+        userName: "",
+        accessToken: { accessToken: "", expiration: "", refreshToken: "" },
+      };    
     }
   },
 
@@ -56,7 +59,7 @@ const authService = {
       return response.data;
     } catch (error: any) {
       Alert.alert("Error", error.message);
-      throw new Error(error.message);
+      return {success: false, message: "Kullanıcı Kaydı gerçekleşmedi."}
     }
   },
 

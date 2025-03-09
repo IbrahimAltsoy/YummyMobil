@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import authService from "../services/authService";
 import { LoginRequest } from "../models/auth/LoginRequest";
 import { UserLoginCommandResponse } from "../models/auth/UserLoginCommandResponse";
+import { Alert } from "react-native";
 
 // AuthContext'i TypeScript'e uygun şekilde tanımlıyoruz
 interface AuthContextType {
@@ -24,15 +25,19 @@ const AuthProvider: React.FC = ({ children }: any) => {
       const response: UserLoginCommandResponse = await authService.login(
         loginData
       );
-      setUser(response.userName);
-      setIsAuthenticated(true);
+      if (response.accessToken && response.accessToken.accessToken) {
+        setUser(response.userName);
+        setIsAuthenticated(true);
+      } else {
+        Alert.alert("Giriş hatası", "Geçersiz kullanıcı bilgileri");
+        setIsAuthenticated(false);
+      }
     } catch (error: any) {
-      console.error("Giriş Başarısız:", error.message);
+      Alert.alert("Giriş hatası", error.message);
+      setIsAuthenticated(false);
     }
   };
   const logout = async () => {
-    // await AsyncStorage.removeItem("accessToken");
-    // await AsyncStorage.removeItem("refreshToken");
     await authService.logout();
     setIsAuthenticated(false);
     setUser(null);

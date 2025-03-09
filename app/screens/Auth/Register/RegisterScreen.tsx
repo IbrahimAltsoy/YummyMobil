@@ -7,8 +7,8 @@ import styles from "./Register.Style";
 import { RegisterCommandRequest } from "@/app/models/register/RegisterCommandRequest";
 import { RegisterCommandResponse } from "@/app/models/register/RegisterCommandResponse";
 import { Ionicons } from "@expo/vector-icons";
-
 import { useTranslation } from "react-i18next";
+
 interface Props {
   navigation: {
     navigate: (screen: string) => void;
@@ -30,6 +30,15 @@ const RegisterScreen = ({ navigation }: Props) => {
   };
 
   const handleRegister = async () => {
+    if (name.length < 3) {
+      setError(t("Adınız en az 3 karakter olmalıdır"));
+      return;
+    }
+
+    if (surname.length < 2) {
+      setError(t("Soyadınız en az 2 karakter olmalıdır"));
+      return;
+    }
     if (!validateEmail(email)) {
       setError(t("Geçersiz e-posta formatı"));
       return;
@@ -72,19 +81,25 @@ const RegisterScreen = ({ navigation }: Props) => {
 
       <YInput
         value={name}
-        onChangeText={(text: any) => setName(text)}
+        onChangeText={(text: any) => {
+          setName(text);
+          setError(""); // Hata mesajını temizle
+        }}
         placeholder={t("Adınız")}
-        style={styles.input}
+        style={[styles.input, error ? styles.errorInput : null]}
       />
       <YInput
         value={surname}
-        onChangeText={(text: any) => setSurname(text)}
+        onChangeText={(text: string) => {
+          setSurname(text);
+          setError(""); // Hata mesajını temizle
+        }}
         placeholder={t("Soyadınız")}
-        style={styles.input}
+        style={[styles.input, error ? styles.errorInput : null]}
       />
       <YInput
         value={email}
-        onChangeText={(text: any) => {
+        onChangeText={(text: string) => {
           setEmail(text);
           setError(""); // Hata mesajını temizle
         }}
@@ -92,17 +107,17 @@ const RegisterScreen = ({ navigation }: Props) => {
         style={[styles.input, error ? styles.errorInput : null]}
       />
       <YInput
-        placeholder={"Şifreniz"}
+        placeholder={t("Şifreniz")}
         secureTextEntry={true}
         value={password}
-        onChangeText={(text: any) => setPassword(text)}
+        onChangeText={(text: string) => setPassword(text)}
         style={styles.input}
       />
       <YInput
         placeholder={t("Şifre Tekrar")}
         secureTextEntry={true}
         value={passwordConfirm}
-        onChangeText={(text: any) => setPasswordConfirm(text)}
+        onChangeText={(text: string) => setPasswordConfirm(text)}
         style={styles.input}
       />
 

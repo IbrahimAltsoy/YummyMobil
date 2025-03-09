@@ -4,6 +4,7 @@ import axios from "axios";
 import { CreateUserFeedbackCommandRequest } from "../models/UserFeedback/CreateUserFeedbackCommandRequest ";
 import API_URL from "../utils/baseUrl";
 import apiClient from "../utils/apiClient";
+import { Alert } from "react-native";
 
 export class FeedbackService {
   public async createUserFeedback(
@@ -21,13 +22,6 @@ export class FeedbackService {
       );
       return response.data;
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error("Axios error mesajı:", error.message);
-        console.error("Response data:", error.response?.data);
-        console.error("Response status:", error.response?.status);
-      } else {
-        console.error("Beklenmeyen hata:", error);
-      }
       throw error;
     }
   }
