@@ -115,7 +115,9 @@ const PlaceDetailScreen = () => {
       />
 
       <Text style={styles.title}>{placeDetail?.result.name}</Text>
-
+      <Text style={styles.sourceText}>
+        {t("Bilgiler Google tarafından sağlanmaktadır.")}
+      </Text>
       <View style={styles.detailContainer}>
         <Text style={styles.address}>
           {placeDetail?.result.vicinity
@@ -249,6 +251,9 @@ const PlaceDetailScreen = () => {
         <Text style={styles.title}>
           {t("Yorumlar")} ({placeDetail?.result.reviews?.length})
         </Text>
+        <Text style={styles.sourceText}>
+          {t("Bilgiler Google tarafından sağlanmaktadır.")}
+        </Text>
         <FlatList
           data={placeDetail?.result.reviews || []}
           keyExtractor={(item, index) => index.toString()}
@@ -264,6 +269,12 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: "#fff",
+  },
+  sourceText: {
+    fontSize: 10,
+    color: "#999",
+    textAlign: "center",
+    marginTop: 5,
   },
   title: {
     fontSize: 24,

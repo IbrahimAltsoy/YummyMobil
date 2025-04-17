@@ -29,7 +29,7 @@ const AuthProvider: React.FC = ({ children }: any) => {
         setUser(response.userName);
         setIsAuthenticated(true);
       } else {
-        Alert.alert("Giriş hatası", "Geçersiz kullanıcı bilgileri");
+        Alert.alert("Giriş hatası", "Email ve ya sifre yanlış");
         setIsAuthenticated(false);
       }
     } catch (error: any) {

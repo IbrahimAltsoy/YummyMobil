@@ -62,6 +62,9 @@ const YCard: React.FC<YCardProps> = ({
         >
           <Text style={styles.detailButtonText}>{t("Detayları Gör")}</Text>
         </TouchableOpacity>
+        <Text style={styles.sourceText}>
+          {t("Bilgiler Google tarafından sağlanmaktadır.")}
+        </Text>
       </View>
     </View>
   );
@@ -82,6 +85,12 @@ const styles = StyleSheet.create({
     width: "95%",
     alignSelf: "center",
     alignItems: "center", // Dikey hizalama
+  },
+  sourceText: {
+    fontSize: 10,
+    color: "#999",
+    textAlign: "right",
+    marginTop: 5,
   },
   image: {
     width: 100, // Küçük ve solda
